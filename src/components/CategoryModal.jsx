@@ -35,7 +35,12 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
         e.preventDefault();
         setSaving(true);
         try {
-            await onSave(formData);
+            // Convert empty string parent to null for backend
+            const submissionData = {
+                ...formData,
+                parent: formData.parent === '' ? null : formData.parent
+            };
+            await onSave(submissionData);
             onClose();
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to save category');
