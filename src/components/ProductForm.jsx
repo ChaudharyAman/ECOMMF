@@ -140,12 +140,23 @@ const ProductForm = ({ onCancel, initialData = null }) => {
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.name}
-                </option>
-              ))}
+              <option value="">Select Sub-Category</option>
+              {categories
+                .filter(cat => !cat.parent) // Get Primary
+                .map(primary => {
+                    const subs = categories.filter(c => c.parent && (c.parent === primary._id || c.parent._id === primary._id));
+                    if (subs.length === 0) return null;
+                    return (
+                        <optgroup key={primary._id} label={primary.name}>
+                            {subs.map(sub => (
+                                <option key={sub._id} value={sub._id}>
+                                    {sub.name}
+                                </option>
+                            ))}
+                        </optgroup>
+                    );
+                })
+              }
             </select>
           </div>
           <div className="md:col-span-2">

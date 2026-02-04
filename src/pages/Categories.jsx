@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories, fetchProducts } from '../features/products/productSlice';
 import { Link } from 'react-router-dom';
-import { Loader2, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Loader2, ChevronDown, CheckCircle, ArrowRight } from 'lucide-react';
 
 const Categories = () => {
     const dispatch = useDispatch();
     const { categories, products, loading } = useSelector((state) => state.products);
+    const [expandedCategory, setExpandedCategory] = useState(null);
 
     useEffect(() => {
         dispatch(fetchCategories());
@@ -15,16 +16,28 @@ const Categories = () => {
         }
     }, [dispatch, products.length]);
 
-    // Helper to find one product image for a category
-    const getCategoryImage = (category) => {
-        const product = products.find(p => {
-            const pCatId = p.category?._id || p.category;
-            const catId = category._id;
-            // Check for ID match or fuzzy name match
-            return pCatId === catId || p.category?.name === category.name;
-        });
+    // Group Categories
+    const primaryCategories = categories.filter(c => !c.parent && c.isActive !== false && c.isFeatured);
+
+    const toggleExpand = (id) => {
+        if (expandedCategory === id) {
+            setExpandedCategory(null);
+        } else {
+            setExpandedCategory(id);
+        }
+    };
+
+    // Helper to get image for primary category
+    const getCategoryImage = (primaryCat) => {
+        // 1. Check featured product image (Priority)
+        if (primaryCat.featuredProduct && primaryCat.featuredProduct.images && primaryCat.featuredProduct.images.length > 0) {
+            return primaryCat.featuredProduct.images[0].url;
+        }
+        // 2. Check direct image field
+        if (primaryCat.image) return primaryCat.image;
         
-        return product?.images?.[0]?.url || null;
+        // 3. Fallback
+        return 'https://images.unsplash.com/photo-1472851294608-4155f2118c03?q=80&w=2070&auto=format&fit=crop'; 
     };
 
     if (loading && categories.length === 0) {
@@ -36,73 +49,50 @@ const Categories = () => {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 py-12 px-6 lg:px-12 font-sans text-stone-800">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-stone-50 py-12 px-4 lg:px-8 font-sans text-stone-800">
+            <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16">
-                    <span className="text-xs font-bold tracking-[0.2em] text-stone-500 uppercase mb-3 block">Collections</span>
-                    <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-6">Browse by Category</h1>
+                    <span className="text-xs font-bold tracking-[0.2em] text-stone-500 uppercase mb-3 block">Curated Collections</span>
+                    <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-6">Explore by Category</h1>
                     <p className="text-lg text-stone-600 max-w-2xl mx-auto">
-                        Explore our thoughtfully curated collections, each designed to help you find the perfect gift for every occasion.
+                        Browse our exclusive collections. Select a category to discover specific items.
                     </p>
                 </div>
 
-                {categories.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {categories
-                            .filter(category => category.isActive !== false) // Only show active categories
-                            .map((category) => {
-                            const imageUrl = getCategoryImage(category);
-                            
-                            return (
-                                <div key={category._id} className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full">
-                                    
-                                    {/* Image Area */}
-                                    <div className="relative aspect-[4/3] overflow-hidden bg-stone-200">
-                                        {imageUrl ? (
-                                            <img 
-                                                src={imageUrl} 
-                                                alt={category.name}
-                                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex flex-col items-center justify-center text-stone-300 gap-2">
-                                                <ShoppingBag className="w-10 h-10 opacity-20" />
-                                                <span className="text-xs font-medium uppercase tracking-widest opacity-40">No Images</span>
-                                            </div>
-                                        )}
-                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
-                                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {primaryCategories.map((primary) => {
+                        const subCategories = categories.filter(c => c.parent && (c.parent === primary._id || c.parent._id === primary._id));
+                        const displayImage = primary.image || getCategoryImage(primary);
 
-                                    {/* Content Area */}
-                                    <div className="p-8 flex flex-col flex-grow items-center text-center">
-                                        <h2 className="text-2xl font-serif text-stone-900 mb-3 group-hover:text-stone-600 transition-colors">
-                                            {category.name}
-                                        </h2>
-                                        <p className="text-stone-500 text-sm mb-6 line-clamp-2 px-4">
-                                            {/* Assuming description might exist, else generic */}
-                                             Discover our exclusive {category.name.toLowerCase()} collection.
-                                        </p>
-                                        
-                                        <div className="mt-auto">
-                                            <Link 
-                                                to={`/category/${category._id}`} 
-                                                className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-stone-900 hover:text-stone-600 transition-colors border-b border-stone-900 hover:border-stone-600 pb-1"
-                                            >
-                                                View Collection <ArrowRight className="w-4 h-4" />
-                                            </Link>
+                        return (
+                            <Link 
+                                key={primary._id}
+                                to={`/category/${primary._id}`} 
+                                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-100 flex flex-col group"
+                            >
+                                {/* Primary Header (Clickable) */}
+                                <div className="relative h-48 sm:h-64 overflow-hidden">
+                                    <img 
+                                        src={displayImage} 
+                                        alt={primary.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors flex items-center justify-center flex-col text-white p-4">
+                                        <h2 className="text-3xl font-serif font-medium mb-2">{primary.name}</h2>
+                                        <div className="flex items-center gap-2 opacity-90 text-sm font-medium tracking-wider uppercase bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                                            <span>View Collection</span>
+                                            <ArrowRight className="w-4 h-4 ml-1" />
                                         </div>
                                     </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <div className="text-center py-20 text-stone-400">
-                        <p className="font-serif italic text-xl">
-                            {categories.length === 0 
-                                ? 'No categories found.' 
-                                : 'No active categories available at the moment.'}
-                        </p>
+                            </Link>
+                        );
+                    })}
+                </div>
+
+                {primaryCategories.length === 0 && !loading && (
+                    <div className="text-center py-24 text-stone-400">
+                        No categories found.
                     </div>
                 )}
             </div>

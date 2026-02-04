@@ -30,8 +30,17 @@ const CategoryManagement = () => {
         loadCategories();
     }, []);
 
-    const handleOpenAdd = () => {
-        setEditingCategory(null);
+    const [expandedCategories, setExpandedCategories] = useState({});
+
+    const toggleExpand = (id) => {
+        setExpandedCategories(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
+    };
+
+    const handleOpenAdd = (parentId = null) => {
+        setEditingCategory({ parent: parentId }); // Pass parent as partial object to pre-fill
         setShowModal(true);
     };
 
@@ -41,7 +50,7 @@ const CategoryManagement = () => {
     };
 
     const handleSave = async (formData) => {
-        if (editingCategory) {
+        if (editingCategory && editingCategory._id) {
             await updateCategory(editingCategory._id, formData);
             toast.success('Category updated successfully');
         } else {
@@ -51,9 +60,20 @@ const CategoryManagement = () => {
         loadCategories();
     };
 
+    // Filter and Group
     const filteredCategories = categories.filter(cat => 
         cat.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    
+    // Note: If search term exists, we might want to show flat list or expand all. 
+    // For now, let's keep hierarchy if possible, or flat if searching.
+    const isSearching = searchTerm.length > 0;
+
+    const primaryCategories = filteredCategories.filter(c => !c.parent);
+    
+    // Helper to get subs from the MAIN list (to ensure we have all subs even if parent is filtered out? 
+    // No, if parent is filtered out, we usually show flattened results or nothing. 
+    // Let's stick to: If searching, show flat list. If not, show hierarchy.)
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -70,17 +90,17 @@ const CategoryManagement = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight">Category Management</h1>
-                    <p className="text-stone-500 mt-1">Create and organize product categories.</p>
+                    <p className="text-stone-500 mt-1">Manage Primary and Sub-categories.</p>
                 </div>
                 <button 
-                    onClick={handleOpenAdd}
+                    onClick={() => handleOpenAdd(null)}
                     className="bg-stone-900 text-white px-5 py-2.5 rounded-full font-medium shadow-lg shadow-stone-200 hover:bg-stone-700 transition-all active:scale-95 flex items-center gap-2"
                 >
-                    <Plus className="w-5 h-5" /> Add Category
+                    <Plus className="w-5 h-5" /> Add Primary Category
                 </button>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden min-h-[400px]">
                 
                 {/* Toolbar */}
                 <div className="p-4 border-b border-stone-100 flex items-center gap-4 bg-stone-50/50">
@@ -98,79 +118,107 @@ const CategoryManagement = () => {
                     </div>
                 </div>
 
-                {/* Table */}
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-stone-100">
-                        <thead className="bg-stone-50 text-stone-500">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Slug</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Parent Category</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Featured</th>
-                                <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-stone-100">
-                            {loading ? (
-                                <tr><td colSpan="6" className="px-6 py-12 text-center text-stone-400">Loading categories...</td></tr>
-                            ) : filteredCategories.length === 0 ? (
-                                <tr><td colSpan="6" className="px-6 py-12 text-center text-stone-400">No categories found.</td></tr>
+                {/* Content */}
+                <div className="p-6">
+                    {loading ? (
+                        <div className="text-center py-12 text-stone-400">Loading hierarchy...</div>
+                    ) : isSearching ? (
+                        // Flat List for Search Results
+                        <div className="grid grid-cols-1 gap-4">
+                            {filteredCategories.map(cat => (
+                                <div key={cat._id} className="flex items-center justify-between p-4 border border-stone-100 rounded-xl bg-stone-50">
+                                    <div className="flex items-center gap-3">
+                                         <div className="h-10 w-10 rounded-lg bg-white border border-stone-200 flex items-center justify-center text-stone-400 overflow-hidden shrink-0">
+                                            {cat.image ? <img src={cat.image} className="w-full h-full object-cover" /> : <Layers className="w-5 h-5 opacity-50" />}
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-stone-800">{cat.name}</div>
+                                            <div className="text-xs text-stone-500">
+                                                {cat.parent ? `Sub-category of ${cat.parent.name}` : 'Primary Category'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => handleOpenEdit(cat)} className="text-stone-400 hover:text-stone-900 p-2"><Pencil className="w-4 h-4" /></button>
+                                </div>
+                            ))}
+                            {filteredCategories.length === 0 && <div className="text-center text-stone-400">No matches found.</div>}
+                        </div>
+                    ) : (
+                        // Hierarchical View
+                        <div className="space-y-4">
+                            {primaryCategories.length === 0 ? (
+                                <div className="text-center py-12 text-stone-400">No categories found. Add a Primary Category to start.</div>
                             ) : (
-                                filteredCategories.map((category) => (
-                                    <tr key={category._id} className="hover:bg-stone-50/60 transition-colors group">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-lg bg-stone-100 flex items-center justify-center text-stone-400 overflow-hidden border border-stone-100 shrink-0">
-                                                    {category.image ? (
-                                                        <img src={category.image} alt="" className="h-full w-full object-cover" />
+                                primaryCategories.map(primary => {
+                                    const isExpanded = expandedCategories[primary._id];
+                                    const subCategories = categories.filter(c => c.parent && (c.parent._id === primary._id || c.parent === primary._id));
+                                    
+                                    return (
+                                        <div key={primary._id} className="border border-stone-200 rounded-xl overflow-hidden shadow-sm transition-all hover:shadow-md">
+                                            {/* Primary Header */}
+                                            <div className="bg-stone-50 p-4 flex items-center justify-between group">
+                                                <div className="flex items-center gap-4 flex-1 cursor-pointer" onClick={() => toggleExpand(primary._id)}>
+                                                    <button className={`text-stone-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
+                                                        <ChevronRight className="w-5 h-5" />
+                                                    </button>
+                                                    <div className="h-12 w-12 rounded-lg bg-white border border-stone-200 flex items-center justify-center text-stone-300 overflow-hidden shrink-0">
+                                                        {primary.image ? <img src={primary.image} className="w-full h-full object-cover" /> : <Layers className="w-6 h-6 opacity-40" />}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-bold text-lg text-stone-900">{primary.name}</h3>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            <span className="text-xs font-semibold px-2 py-0.5 bg-stone-200 text-stone-600 rounded-full">{subCategories.length} Sub-categories</span>
+                                                            {primary.isFeatured && <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center"><CheckCircle className="w-3 h-3 mr-1"/> Featured</span>}
+                                                            {!primary.isActive && <span className="text-xs font-bold text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">Inactive</span>}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                    <button 
+                                                        onClick={() => handleOpenAdd(primary._id)}
+                                                        className="text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center transition-colors"
+                                                    >
+                                                        <Plus className="w-3.5 h-3.5 mr-1" /> Add Sub
+                                                    </button>
+                                                    <button onClick={() => handleOpenEdit(primary)} className="text-stone-400 hover:text-stone-900 p-2 hover:bg-stone-200 rounded-lg transition-colors"><Pencil className="w-4 h-4" /></button>
+                                                </div>
+                                            </div>
+
+                                            {/* Sub Categories List */}
+                                            {isExpanded && (
+                                                <div className="bg-white border-t border-stone-100 divide-y divide-stone-50">
+                                                    {subCategories.length === 0 ? (
+                                                        <div className="p-8 text-center text-stone-400 text-sm">
+                                                            No sub-categories yet. <button onClick={() => handleOpenAdd(primary._id)} className="text-indigo-600 font-semibold hover:underline">Add one</button>
+                                                        </div>
                                                     ) : (
-                                                        <Layers className="w-5 h-5 opacity-50" />
+                                                        subCategories.map(sub => (
+                                                            <div key={sub._id} className="p-3 pl-16 pr-4 flex items-center justify-between hover:bg-stone-50 transition-colors group/sub">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="h-8 w-8 rounded bg-stone-100 flex items-center justify-center text-stone-300 overflow-hidden shrink-0">
+                                                                        {sub.image ? <img src={sub.image} className="w-full h-full object-cover" /> : <Layers className="w-4 h-4 opacity-40" />}
+                                                                    </div>
+                                                                    <span className="text-sm font-medium text-stone-700">{sub.name}</span>
+                                                                    {sub.isFeatured && <CheckCircle className="w-3 h-3 text-amber-500" />}
+                                                                    {!sub.isActive && <span className="text-[10px] text-stone-400 border border-stone-200 px-1 rounded">Hidden</span>}
+                                                                </div>
+                                                                <button 
+                                                                    onClick={() => handleOpenEdit(sub)} 
+                                                                    className="text-stone-300 hover:text-stone-800 p-1.5 rounded hover:bg-stone-200 transition-colors opacity-0 group-hover/sub:opacity-100"
+                                                                >
+                                                                    <Pencil className="w-3.5 h-3.5" />
+                                                                </button>
+                                                            </div>
+                                                        ))
                                                     )}
                                                 </div>
-                                                <span className="font-semibold text-stone-800">{category.name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono">
-                                            {category.slug}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
-                                            {category.parent ? (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700">
-                                                    {category.parent.name}
-                                                </span>
-                                            ) : (
-                                                <span className="text-stone-400 text-xs italic">Top Level</span>
                                             )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {category.isActive ? (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">Active</span>
-                                            ) : (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-stone-100 text-stone-500 border border-stone-200">Inactive</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {category.isFeatured ? (
-                                                <span className="flex items-center text-amber-500 font-medium text-xs"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Yes</span>
-                                            ) : (
-                                                <span className="text-stone-300 text-xs">-</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                                            <button 
-                                                onClick={() => handleOpenEdit(category)}
-                                                className="text-stone-400 hover:text-stone-900 bg-stone-50 hover:bg-stone-100 p-2 rounded-lg transition-all"
-                                                title="Edit Category"
-                                            >
-                                                <Pencil className="w-4 h-4" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
+                                        </div>
+                                    );
+                                })
                             )}
-                        </tbody>
-                    </table>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

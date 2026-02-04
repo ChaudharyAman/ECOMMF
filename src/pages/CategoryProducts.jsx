@@ -10,38 +10,87 @@ const CategoryProducts = () => {
     const dispatch = useDispatch();
     const { products, categories, loading } = useSelector((state) => state.products);
     const [filteredProducts, setFilteredProducts] = useState([]);
+    const [displayProducts, setDisplayProducts] = useState([]); // Products currently shown (after local sub-cat filter)
     const [categoryName, setCategoryName] = useState('');
     const [categoryDescription, setCategoryDescription] = useState('');
+    const [subCategories, setSubCategories] = useState([]);
+    const [selectedSubCat, setSelectedSubCat] = useState('all');
     
     // Filters and sorting
     const [sortBy, setSortBy] = useState('newest');
     const [priceRange, setPriceRange] = useState('all');
-    const [viewMode, setViewMode] = useState('grid-3'); // 'list' or 'grid-3'
+    const [viewMode, setViewMode] = useState('grid-3'); 
     const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
-        // Ensure data is loaded
         if (products.length === 0) dispatch(fetchProducts());
         if (categories.length === 0) dispatch(fetchCategories());
     }, [dispatch, products.length, categories.length]);
 
     useEffect(() => {
-        // Find category name
-        const category = categories.find(c => c._id === id);
-        if (category) {
-            setCategoryName(category.name);
-            setCategoryDescription(category.description || `Discover our exclusive ${category.name.toLowerCase()} collection.`);
+        // 1. Identify current category
+        const currentCategory = categories.find(c => c._id === id);
+        if (!currentCategory) return;
+
+        setCategoryName(currentCategory.name);
+        setCategoryDescription(currentCategory.description || `Discover our exclusive ${currentCategory.name} collection.`);
+
+        // 2. Identify relationship (Primary or Sub)
+        let relevantCategoryIds = [id];
+        let subs = [];
+
+        if (!currentCategory.parent) {
+            // It's a Primary Category -> Get all its sub-categories
+            subs = categories.filter(c => c.parent === id || c.parent?._id === id);
+            relevantCategoryIds = [id, ...subs.map(s => s._id)];
+            setSubCategories(subs);
+        } else {
+            // It's a Sub-category -> Show siblings? Or just itself? 
+            // User asked: "top option to select the subcategory". 
+            // Usually implies viewing Primary allows filtering by Sub. 
+            // If viewing Sub, maybe show siblings filter?
+            // Let's implement: If Primary, show Subs filter. If Sub, show siblings (all subs of same parent).
+            
+            const parentId = currentCategory.parent._id || currentCategory.parent;
+            subs = categories.filter(c => c.parent === parentId || c.parent?._id === parentId);
+            relevantCategoryIds = [id]; // Initially just show this sub's products
+            
+            // Actually, if we want the user to be able to switch subs easily, we should probably 
+            // redirect to the Primary view with this sub selected, OR just load all siblings' data 
+            // but pre-select this sub.
+            // Let's try loading all siblings + parent to allow easy switching.
+            relevantCategoryIds = [parentId, ...subs.map(s => s._id)];
+            setSubCategories(subs);
+            setSelectedSubCat(id); // Pre-select current
         }
 
-        // Filter products by category
-        let filtered = products.filter(p => {
+        // 3. Filter products matching ANY of the relevant IDs
+        let initialSet = products.filter(p => {
              const pCatId = p.category?._id || p.category;
-             return pCatId === id || p.category?.name === category?.name;
+             return relevantCategoryIds.includes(pCatId);
         });
 
-        // Apply price filter
+        // 4. Apply Filters (Price, Sort) - Common Logic
+        // We will do sub-cat filtering in a separate effect or memo to avoid re-running this too much
+        setFilteredProducts(initialSet);
+
+    }, [id, products, categories]);
+
+    // Apply Sub-Cat Filter, Price, Sort
+    useEffect(() => {
+        let result = [...filteredProducts];
+
+        // Sub-category Filter
+        if (selectedSubCat !== 'all') {
+            result = result.filter(p => {
+                const pCatId = p.category?._id || p.category;
+                return pCatId === selectedSubCat;
+            });
+        }
+
+        // Price Filter
         if (priceRange !== 'all') {
-            filtered = filtered.filter(p => {
+            result = result.filter(p => {
                 const price = p.price;
                 if (priceRange === 'under500') return price < 500;
                 if (priceRange === '500-1000') return price >= 500 && price <= 1000;
@@ -51,18 +100,17 @@ const CategoryProducts = () => {
             });
         }
 
-        // Apply sorting
-        filtered = [...filtered].sort((a, b) => {
+        // Sorting
+        result.sort((a, b) => {
             if (sortBy === 'price-low') return a.price - b.price;
             if (sortBy === 'price-high') return b.price - a.price;
             if (sortBy === 'name') return a.name.localeCompare(b.name);
-            // Default: newest first
             return new Date(b.createdAt) - new Date(a.createdAt);
         });
 
-        setFilteredProducts(filtered);
+        setDisplayProducts(result);
 
-    }, [id, products, categories, sortBy, priceRange]);
+    }, [filteredProducts, selectedSubCat, priceRange, sortBy]);
 
     if (loading && products.length === 0) {
         return (
@@ -98,11 +146,42 @@ const CategoryProducts = () => {
             {/* Filters & Products Section */}
             <div className="max-w-7xl mx-auto px-6 py-12">
                 
+                {/* Sub-Category Filter Tabs */}
+                {subCategories.length > 0 && (
+                    <div className="mb-8 overflow-x-auto pb-2 scrollbar-hide">
+                        <div className="flex gap-2 min-w-max">
+                            <button
+                                onClick={() => setSelectedSubCat('all')}
+                                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                                    selectedSubCat === 'all' 
+                                    ? 'bg-stone-900 text-white shadow-md' 
+                                    : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-400 hover:text-stone-900'
+                                }`}
+                            >
+                                All Products
+                            </button>
+                            {subCategories.map(sub => (
+                                <button
+                                    key={sub._id}
+                                    onClick={() => setSelectedSubCat(sub._id)}
+                                    className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                                        selectedSubCat === sub._id
+                                        ? 'bg-stone-900 text-white shadow-md'
+                                        : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-400 hover:text-stone-900'
+                                    }`}
+                                >
+                                    {sub.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Toolbar */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-6 border-b border-stone-200">
                     <div className="flex items-center gap-4">
                         <p className="text-sm text-stone-600">
-                            <span className="font-bold text-stone-900">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'Product' : 'Products'}
+                            <span className="font-bold text-stone-900">{displayProducts.length}</span> {displayProducts.length === 1 ? 'Product' : 'Products'}
                         </p>
                         
                         {/* Mobile Filter Toggle */}
@@ -200,11 +279,11 @@ const CategoryProducts = () => {
 
                     {/* Products Grid/List */}
                     <div className="flex-1">
-                        {filteredProducts.length > 0 ? (
+                        {displayProducts.length > 0 ? (
                             viewMode === 'list' ? (
                                 // List View
                                 <div className="space-y-4">
-                                    {filteredProducts.map(product => (
+                                    {displayProducts.map(product => (
                                         <Link 
                                             key={product._id} 
                                             to={`/product/${product._id}`}
@@ -267,7 +346,7 @@ const CategoryProducts = () => {
                             ) : (
                                 // Grid View
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {filteredProducts.map(product => (
+                                    {displayProducts.map(product => (
                                         <ProductCard key={product._id} product={product} />
                                     ))}
                                 </div>
