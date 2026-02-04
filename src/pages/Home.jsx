@@ -43,7 +43,7 @@ const Home = () => {
                 <div className="space-y-8 animate-fade-in-up">
                     <span className="text-xs font-bold tracking-[0.2em] text-stone-500 uppercase">The Art of Giving</span>
                     <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif text-stone-900 leading-[0.9]">
-                        Curated <br/> <i className="font-serif italic text-stone-600">Thoughtful</i> <br/> Gestures.
+                        Curated <br/> <i className="font-serif italic text-stone-600">Thoughtful</i> <br/> .
                     </h1>
                     <p className="text-lg text-stone-600 max-w-md leading-relaxed">
                         Explore our collection of hand-picked treasures designed to make every moment memorable. 
