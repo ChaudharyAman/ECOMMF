@@ -129,11 +129,75 @@ const ProductSelectionModal = ({ isOpen, onClose, onSelect, currentProduct }) =>
     );
 };
 
+const CreateCategoryModal = ({ isOpen, onClose, onCreate }) => {
+    const [name, setName] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name.trim()) return;
+
+        setLoading(true);
+        try {
+            await onCreate(name);
+            setName('');
+            onClose();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Create New Category</h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                            Category Name
+                        </label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            placeholder="e.g. Electronics"
+                            autoFocus
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading || !name.trim()}
+                            className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                        >
+                            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Create Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
 const CategoryManagement = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState(null);
 
     const loadCategories = useCallback(async () => {
@@ -152,6 +216,18 @@ const CategoryManagement = () => {
     useEffect(() => {
         loadCategories();
     }, [loadCategories]);
+
+    const handleCreateCategory = async (name) => {
+        try {
+            const result = await import('../api/adminApi').then(mod => mod.createCategory({ name }));
+            toast.success('Category created successfully');
+            setCategories(prev => [...prev, result]);
+        } catch (err) {
+            console.error(err);
+            toast.error(err.response?.data?.message || 'Failed to create category');
+            throw err;
+        }
+    };
 
     const handleToggleFeatured = useCallback(async (category) => {
         try {
@@ -242,12 +318,26 @@ const CategoryManagement = () => {
                 onSelect={handleProductSelect}
                 currentProduct={activeCategory?.featuredProduct}
             />
+            <CreateCategoryModal
+                isOpen={createModalOpen}
+                onClose={() => setCreateModalOpen(false)}
+                onCreate={handleCreateCategory}
+            />
 
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Category Management</h1>
                     <p className="text-slate-500 mt-1">Manage category visibility and featured status for the homepage.</p>
                 </div>
+                <button
+                    onClick={() => setCreateModalOpen(true)}
+                    className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all gap-2"
+                >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create Category
+                </button>
             </div>
 
             {loading ? (
@@ -257,7 +347,13 @@ const CategoryManagement = () => {
             ) : categories.length === 0 ? (
                 <div className="bg-white p-12 rounded-xl shadow-sm border border-slate-100 text-center">
                     <h3 className="text-xl font-bold text-slate-800 mb-2">No Categories Found</h3>
-                    <p className="text-slate-500">Create categories to get started.</p>
+                    <p className="text-slate-500 mb-6">Create categories to get started.</p>
+                    <button
+                        onClick={() => setCreateModalOpen(true)}
+                        className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all gap-2"
+                    >
+                        Create First Category
+                    </button>
                 </div>
             ) : (
                 <div className="bg-white shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden border border-slate-200">

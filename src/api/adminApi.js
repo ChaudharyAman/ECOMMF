@@ -67,6 +67,12 @@ export const createVendor = async (data) => {
     return response.data;
 };
 
+
+export const createCategory = async (data) => {
+    const response = await axios.post(`${API_URL}/categories`, data, getAuthHeaders());
+    return response.data;
+};
+
 export const fetchCategories = async () => {
     const response = await axios.get(`${API_URL}/categories`);
     return response.data;
