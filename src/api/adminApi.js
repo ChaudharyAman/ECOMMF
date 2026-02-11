@@ -41,6 +41,12 @@ export const fetchAllProducts = async (params = {}) => {
     console.log('[API] fetchAllProducts response:', response.data);
     return response.data;
 };
+
+export const fetchApprovedProducts = async (params = {}) => {
+    console.log('[API] calling fetchApprovedProducts (Admin) with params:', params);
+    const response = await axios.get(`${API_URL}/admin/products/approved`, { ...getAuthHeaders(), params });
+    return response.data;
+};
 // Vendor Management
 export const fetchVendors = async () => {
     const response = await axios.get(`${API_URL}/admin/vendors`, getAuthHeaders());

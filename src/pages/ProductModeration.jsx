@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { fetchPendingProducts, approveProduct, rejectProduct, fetchCategories, fetchVendors, fetchAllProducts, updateProduct, updateCategory } from '../api/adminApi';
+import { fetchPendingProducts, approveProduct, rejectProduct, fetchCategories, fetchVendors, fetchAllProducts, updateProduct, updateCategory, fetchApprovedProducts } from '../api/adminApi';
 import ProductForm from '../components/ProductForm';
 import ProductDetailView from '../components/ProductDetailView';
 import { Star, ChevronDown, Search, Loader2 } from 'lucide-react';
@@ -52,10 +52,8 @@ const ProductModeration = () => {
       if (activeTab === 'pending') {
           data = await fetchPendingProducts(params);
       } else {
-          // For approved and catalog tabs, fetch all active products
-          // fetchAllProducts calls the public API which currently filters by approved & active
-          const res = await fetchAllProducts(params); 
-          data = res.products; // Public API returns { products: [], page, pages }
+          // Use Admin API for approved/catalog view to see ALL products (including inactive)
+          data = await fetchApprovedProducts(params);
       }
       
       console.log('Frontend products load:', data);
@@ -645,18 +643,25 @@ function ExpandedProductRow({ product, handleApprove, openRejectModal, closeDeta
             >
                 Edit Details
             </button>
+            
+            {product.status === 'pending' && (
+                <>
+                    <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block"></div>
+                    <button 
+                        onClick={handleApprove}
+                        className="px-4 py-2 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
+                    >
+                        Approve Product
+                    </button>
+                </>
+            )}
+
             <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block"></div>
-            <button 
-                onClick={handleApprove}
-                className="px-4 py-2 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
-            >
-                Approve Product
-            </button>
             <button 
                 onClick={openRejectModal}
                 className="px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all"
             >
-                Reject
+                {product.status === 'approved' ? 'Disable / Reject' : 'Reject'}
             </button>
         </>
     );
