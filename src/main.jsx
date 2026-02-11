@@ -25,6 +25,7 @@ import ErrorPage from './pages/ErrorPage'
 
 import Home from './pages/Home'
 import SearchResults from './pages/SearchResults'
+import About from './pages/About'
 
 import Cart from './pages/Cart'
 import Wishlist from './pages/Wishlist'
@@ -104,6 +105,10 @@ const router = createBrowserRouter([
       {
         path: 'search',
         element: <SearchResults />,
+      },
+      {
+        path: 'about',
+        element: <About />,
       },
     ],
   },
