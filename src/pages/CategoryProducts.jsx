@@ -24,8 +24,8 @@ const CategoryProducts = () => {
 
     useEffect(() => {
         // Fetch products specifically for this category (and its subcategories, handled by backend)
-        // Passing 'limit: 100' or similar if pagination needed, essentially getting ample products for the page
-        dispatch(fetchProducts({ category: id })); 
+        // Passing 'limit: 1000' to ensure we get all products for now, avoiding pagination issues in the UI
+        dispatch(fetchProducts({ category: id, limit: 1000 })); 
         
         if (categories.length === 0) dispatch(fetchCategories());
     }, [dispatch, id, categories.length]);
