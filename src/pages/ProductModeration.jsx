@@ -176,13 +176,30 @@ const ProductModeration = () => {
 
   // Group products by category for catalog view with search filtering
   const groupedProducts = useMemo(() => {
+    // Helper for safe ID comparison
+    const safeId = (id) => id ? String(id) : '';
+
     const grouped = categories.map(category => ({
         ...category,
-        products: products.filter(p => 
-            (p.category?._id === category._id || p.category === category._id)
-        )
+        products: products.filter(p => {
+             const pCatId = p.category?._id || p.category; // Handle populated object or raw ID
+             return safeId(pCatId) === safeId(category._id);
+        })
     })).filter(cat => cat.products.length > 0);
     
+    // Find products that didn't match ANY category (Uncategorized)
+    const categorizedProductIds = new Set(grouped.flatMap(c => c.products.map(p => p._id)));
+    const uncategorizedProducts = products.filter(p => !categorizedProductIds.has(p._id));
+    
+    if (uncategorizedProducts.length > 0) {
+        grouped.push({
+            _id: 'uncategorized',
+            name: 'Uncategorized',
+            products: uncategorizedProducts,
+            featuredProduct: null
+        });
+    }
+
     // Apply search filter if catalog search is active
     if (catalogSearch.trim()) {
       const searchLower = catalogSearch.toLowerCase();

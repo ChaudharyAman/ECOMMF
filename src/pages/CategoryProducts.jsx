@@ -23,9 +23,12 @@ const CategoryProducts = () => {
     const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
-        if (products.length === 0) dispatch(fetchProducts());
+        // Fetch products specifically for this category (and its subcategories, handled by backend)
+        // Passing 'limit: 100' or similar if pagination needed, essentially getting ample products for the page
+        dispatch(fetchProducts({ category: id })); 
+        
         if (categories.length === 0) dispatch(fetchCategories());
-    }, [dispatch, products.length, categories.length]);
+    }, [dispatch, id, categories.length]);
 
     useEffect(() => {
         // 1. Identify current category
@@ -64,15 +67,10 @@ const CategoryProducts = () => {
             setSelectedSubCat(id); // Pre-select current
         }
 
-        // 3. Filter products matching ANY of the relevant IDs
-        let initialSet = products.filter(p => {
-             const pCatId = p.category?._id || p.category;
-             return relevantCategoryIds.includes(pCatId);
-        });
-
-        // 4. Apply Filters (Price, Sort) - Common Logic
-        // We will do sub-cat filtering in a separate effect or memo to avoid re-running this too much
-        setFilteredProducts(initialSet);
+        // 3. Filter is now handled by Backend. 
+        // The 'products' list from Redux already contains the correct set (Parent + Subs)
+        // We just need to initialize the local filtered set.
+        setFilteredProducts(products);
 
     }, [id, products, categories]);
 

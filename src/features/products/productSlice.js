@@ -2,9 +2,19 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../utils/api';
 
 // Fetch all products
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async (keyword = '', { rejectWithValue }) => {
+// Fetch all products (supports params object or keyword string)
+export const fetchProducts = createAsyncThunk('products/fetchProducts', async (arg = {}, { rejectWithValue }) => {
   try {
-    const { data } = await api.get(`/products?keyword=${keyword}`);
+    let params = {};
+    if (typeof arg === 'string') {
+        params = { keyword: arg };
+    } else {
+        params = arg;
+    }
+    
+    // Construct query string manually or use axios params (api.get handles existing config, but let's pass params object if api supports it)
+    // Assuming api.get wraps axios.get, we can pass params in config
+    const { data } = await api.get('/products', { params });
     return data;
   } catch (error) {
     return rejectWithValue(error.response.data.message);
