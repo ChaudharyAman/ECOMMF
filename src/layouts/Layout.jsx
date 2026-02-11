@@ -13,6 +13,7 @@ const Layout = () => {
   const { items: cartItems } = useSelector(state => state.cart);
   const { items: wishlistItems } = useSelector(state => state.wishlist);
   
+  
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
