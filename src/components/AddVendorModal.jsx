@@ -24,9 +24,6 @@ const AddVendorModal = ({ onSave, onClose }) => {
         }
     };
 
-
-    
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(''); // Clear previous errors
