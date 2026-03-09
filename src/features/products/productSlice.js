@@ -7,11 +7,11 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async (a
   try {
     let params = {};
     if (typeof arg === 'string') {
-        params = { keyword: arg };
+      params = { keyword: arg };
     } else {
-        params = arg;
+      params = arg;
     }
-    
+
     // Construct query string manually or use axios params (api.get handles existing config, but let's pass params object if api supports it)
     // Assuming api.get wraps axios.get, we can pass params in config
     const { data } = await api.get('/products', { params });
@@ -103,11 +103,15 @@ const productSlice = createSlice({
     resetSuccess: (state) => {
       state.success = false;
     },
+    clearProducts: (state) => {
+      state.products = [];
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
+        state.products = []; // Clear old products immediately to prevent stale data flash
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
@@ -163,24 +167,24 @@ const productSlice = createSlice({
         state.categories = action.payload;
       })
       .addCase(fetchProductById.pending, (state) => {
-          state.loading = true;
+        state.loading = true;
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
-          state.loading = false;
-          // Optimistically update or add to products list
-          const index = state.products.findIndex(p => p._id === action.payload._id);
-          if (index !== -1) {
-              state.products[index] = action.payload;
-          } else {
-              state.products.push(action.payload);
-          }
+        state.loading = false;
+        // Optimistically update or add to products list
+        const index = state.products.findIndex(p => p._id === action.payload._id);
+        if (index !== -1) {
+          state.products[index] = action.payload;
+        } else {
+          state.products.push(action.payload);
+        }
       })
       .addCase(fetchProductById.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload;
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { resetSuccess } = productSlice.actions;
+export const { resetSuccess, clearProducts } = productSlice.actions;
 export default productSlice.reducer;

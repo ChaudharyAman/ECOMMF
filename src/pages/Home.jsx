@@ -32,33 +32,46 @@ const Home = () => {
 
             {/* --- Promotional Category Banner (Top Priority) --- */}
             {promoCategory && (
-                <section className="w-full pt-20 pb-4 px-4 sm:px-6 lg:px-8 bg-[#FDFBF7]">
-                    <div className="max-w-[1600px] mx-auto relative rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-lg h-[250px] sm:h-[350px] md:h-[450px] flex items-center group cursor-pointer">
+                <section className="w-full pt-[80px] pb-2 px-4 sm:px-8 lg:px-12 bg-[#FDFBF7]">
+                    <div className="max-w-[1400px] mx-auto relative rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[400px] flex items-stretch group cursor-pointer shadow-2xl shadow-stone-300/40">
                         <Link to={`/category/${promoCategory._id}`} className="absolute inset-0 z-20"></Link>
-                        <img
-                            src={promoCategory.promoImage || promoCategory.image || promoCategory.featuredProduct?.images?.[0]?.url || 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?q=80&w=2670&auto=format&fit=crop'}
-                            alt={promoCategory.name}
-                            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[10s] ease-out group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-stone-900/80 via-stone-900/30 to-transparent"></div>
 
-                        <div className="relative z-10 px-6 md:px-12 lg:px-20 max-w-2xl text-white">
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md mb-3 md:mb-6 border border-white/20 shadow-sm">
-                                <Star className="w-3 md:w-4 h-3 md:h-4 text-amber-300 fill-amber-300" />
-                                <span className="text-[10px] md:text-xs font-bold tracking-wider uppercase drop-shadow-sm">Spotlight</span>
+                        {/* Left: Warm Rich Text Panel */}
+                        <div className="relative z-10 flex flex-col justify-center py-8 px-8 md:px-14 w-[55%] md:w-[48%] bg-gradient-to-br from-[#1a1208] via-[#2c1f0e] to-[#3d2b12] flex-shrink-0">
+                            {/* Decorative ribbon corner */}
+                            <div className="absolute top-4 right-4 md:top-6 md:right-6 opacity-30">
+                                <Gift className="w-8 h-8 md:w-12 md:h-12 text-amber-300" />
+                            </div>
+                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/30 mb-4 w-fit">
+                                <Star className="w-3 h-3 text-amber-300 fill-amber-300" />
+                                <span className="text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-amber-200">Curated Spotlight</span>
                             </div>
 
-                            <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif leading-tight mb-2 md:mb-4 drop-shadow-md">
-                                <span className="italic text-amber-100">{promoCategory.name}</span>
+                            <h2 className="text-2xl sm:text-3xl md:text-5xl font-serif text-white leading-snug mb-2 md:mb-4">
+                                The <span className="italic text-amber-200">{promoCategory.name}</span><br />
+                                <span className="text-white/60 text-xl md:text-3xl">Collection</span>
                             </h2>
 
-                            <p className="hidden md:block text-base md:text-lg text-white/90 font-light mb-6 md:mb-8 max-w-md drop-shadow">
-                                Hand-picked treasures curated exclusively for your perfect gesture.
+                            <p className="hidden md:block text-sm text-amber-100/70 font-light mb-6 leading-relaxed max-w-xs">
+                                Thoughtfully curated for those who give with intention. Discover something unforgettable.
                             </p>
 
-                            <div className="inline-flex items-center gap-2 px-5 py-2.5 md:px-8 md:py-4 bg-white text-stone-900 rounded-full font-bold uppercase tracking-wider group-hover:bg-stone-100 transition-colors text-[10px] md:text-sm shadow-xl">
-                                Shop Now <ArrowRight className="w-3.5 h-3.5 md:w-5 md:h-5" />
+                            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-300 text-stone-900 rounded-full font-bold uppercase tracking-widest text-[10px] md:text-xs shadow-lg hover:bg-amber-200 transition-colors w-fit">
+                                Shop the Collection <ArrowRight className="w-3.5 h-3.5" />
                             </div>
+                        </div>
+
+                        {/* Right: Image */}
+                        <div className="flex-1 relative overflow-hidden">
+                            <img
+                                src={promoCategory.promoImage || promoCategory.image || promoCategory.featuredProduct?.images?.[0]?.url || 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?q=80&w=2670&auto=format&fit=crop'}
+                                alt={promoCategory.name}
+                                className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[12s] ease-out group-hover:scale-110"
+                            />
+                            {/* Left edge feather into the dark panel */}
+                            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#2c1f0e] to-transparent"></div>
                         </div>
                     </div>
                 </section>

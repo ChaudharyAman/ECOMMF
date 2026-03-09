@@ -15,20 +15,22 @@ const CategoryProducts = () => {
     const [categoryDescription, setCategoryDescription] = useState('');
     const [subCategories, setSubCategories] = useState([]);
     const [selectedSubCat, setSelectedSubCat] = useState('all');
-    
+
     // Filters and sorting
     const [sortBy, setSortBy] = useState('newest');
     const [priceRange, setPriceRange] = useState('all');
-    const [viewMode, setViewMode] = useState('grid-3'); 
+    const [viewMode, setViewMode] = useState('grid-3');
     const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
-        // Fetch products specifically for this category (and its subcategories, handled by backend)
-        // Passing 'limit: 1000' to ensure we get all products for now, avoiding pagination issues in the UI
-        dispatch(fetchProducts({ category: id, limit: 1000 })); 
-        
+        // Reset local state whenever category changes to avoid stale display
+        setFilteredProducts([]);
+        setSelectedSubCat('all');
+        setPriceRange('all');
+        dispatch(fetchProducts({ category: id, limit: 1000 }));
+
         if (categories.length === 0) dispatch(fetchCategories());
-    }, [dispatch, id, categories.length]);
+    }, [dispatch, id]);
 
     useEffect(() => {
         // 1. Identify current category
@@ -45,7 +47,7 @@ const CategoryProducts = () => {
         if (!currentCategory.parent) {
             // It's a Primary Category -> Get all its sub-categories
             subs = categories.filter(c => c.parent === id || c.parent?._id === id);
-            relevantCategoryIds = [id, ...subs.map(s => s._id)];
+            relevantCategoryIds = [String(id), ...subs.map(s => String(s._id))];
             setSubCategories(subs);
         } else {
             // It's a Sub-category -> Show siblings? Or just itself? 
@@ -53,24 +55,27 @@ const CategoryProducts = () => {
             // Usually implies viewing Primary allows filtering by Sub. 
             // If viewing Sub, maybe show siblings filter?
             // Let's implement: If Primary, show Subs filter. If Sub, show siblings (all subs of same parent).
-            
+
             const parentId = currentCategory.parent._id || currentCategory.parent;
             subs = categories.filter(c => c.parent === parentId || c.parent?._id === parentId);
             relevantCategoryIds = [id]; // Initially just show this sub's products
-            
+
             // Actually, if we want the user to be able to switch subs easily, we should probably 
             // redirect to the Primary view with this sub selected, OR just load all siblings' data 
             // but pre-select this sub.
             // Let's try loading all siblings + parent to allow easy switching.
-            relevantCategoryIds = [parentId, ...subs.map(s => s._id)];
+            relevantCategoryIds = [String(parentId), ...subs.map(s => String(s._id))];
             setSubCategories(subs);
             setSelectedSubCat(id); // Pre-select current
         }
 
-        // 3. Filter is now handled by Backend. 
-        // The 'products' list from Redux already contains the correct set (Parent + Subs)
-        // We just need to initialize the local filtered set.
-        setFilteredProducts(products);
+        // 3. Stringify all IDs to avoid ObjectId reference equality issues with Set.has()
+        const validCategoryIds = new Set(relevantCategoryIds.map(String));
+        const filtered = products.filter(p => {
+            const pCatId = String(p.category?._id || p.category || '');
+            return validCategoryIds.has(pCatId);
+        });
+        setFilteredProducts(filtered);
 
     }, [id, products, categories]);
 
@@ -126,7 +131,7 @@ const CategoryProducts = () => {
                     <Link to="/categories" className="inline-flex items-center gap-2 text-stone-300 hover:text-white transition-colors text-sm font-medium mb-6">
                         <ArrowLeft className="w-4 h-4" /> Back to Collections
                     </Link>
-                    
+
                     <div className="max-w-3xl">
                         <span className="text-xs font-bold tracking-[0.3em] text-stone-400 uppercase mb-4 block">
                             Curated Collection
@@ -143,18 +148,17 @@ const CategoryProducts = () => {
 
             {/* Filters & Products Section */}
             <div className="max-w-7xl mx-auto px-6 py-12">
-                
+
                 {/* Sub-Category Filter Tabs */}
                 {subCategories.length > 0 && (
                     <div className="mb-8 overflow-x-auto pb-2 scrollbar-hide">
                         <div className="flex gap-2 min-w-max">
                             <button
                                 onClick={() => setSelectedSubCat('all')}
-                                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
-                                    selectedSubCat === 'all' 
-                                    ? 'bg-stone-900 text-white shadow-md' 
+                                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${selectedSubCat === 'all'
+                                    ? 'bg-stone-900 text-white shadow-md'
                                     : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-400 hover:text-stone-900'
-                                }`}
+                                    }`}
                             >
                                 All Products
                             </button>
@@ -162,11 +166,10 @@ const CategoryProducts = () => {
                                 <button
                                     key={sub._id}
                                     onClick={() => setSelectedSubCat(sub._id)}
-                                    className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
-                                        selectedSubCat === sub._id
+                                    className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${selectedSubCat === sub._id
                                         ? 'bg-stone-900 text-white shadow-md'
                                         : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-400 hover:text-stone-900'
-                                    }`}
+                                        }`}
                                 >
                                     {sub.name}
                                 </button>
@@ -181,7 +184,7 @@ const CategoryProducts = () => {
                         <p className="text-sm text-stone-600">
                             <span className="font-bold text-stone-900">{displayProducts.length}</span> {displayProducts.length === 1 ? 'Product' : 'Products'}
                         </p>
-                        
+
                         {/* Mobile Filter Toggle */}
                         <button
                             onClick={() => setShowFilters(!showFilters)}
@@ -282,16 +285,16 @@ const CategoryProducts = () => {
                                 // List View
                                 <div className="space-y-4">
                                     {displayProducts.map(product => (
-                                        <Link 
-                                            key={product._id} 
+                                        <Link
+                                            key={product._id}
                                             to={`/product/${product._id}`}
                                             className="flex gap-6 bg-white rounded-xl border border-stone-200 hover:shadow-lg transition-all duration-300 overflow-hidden group"
                                         >
                                             {/* Product Image */}
                                             <div className="w-48 h-48 flex-shrink-0 bg-stone-100 relative overflow-hidden">
                                                 {product.images && product.images.length > 0 ? (
-                                                    <img 
-                                                        src={product.images[0].url} 
+                                                    <img
+                                                        src={product.images[0].url}
                                                         alt={product.name}
                                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                     />
@@ -317,7 +320,7 @@ const CategoryProducts = () => {
                                                         </span>
                                                     )}
                                                 </div>
-                                                
+
                                                 <div className="flex items-center justify-between mt-4">
                                                     <div>
                                                         <span className="text-2xl font-bold text-stone-900">
@@ -357,8 +360,8 @@ const CategoryProducts = () => {
                                     </div>
                                     <h3 className="text-xl font-serif text-stone-900 mb-2">No Products Found</h3>
                                     <p className="text-stone-500 mb-6">
-                                        {priceRange !== 'all' 
-                                            ? 'Try adjusting your filters to see more results.' 
+                                        {priceRange !== 'all'
+                                            ? 'Try adjusting your filters to see more results.'
                                             : 'No products available in this category yet.'}
                                     </p>
                                     {priceRange !== 'all' && (
@@ -369,8 +372,8 @@ const CategoryProducts = () => {
                                             Clear Filters
                                         </button>
                                     )}
-                                    <Link 
-                                        to="/categories" 
+                                    <Link
+                                        to="/categories"
                                         className="inline-block mt-3 text-stone-600 hover:text-stone-900 underline text-sm"
                                     >
                                         Browse Other Collections
