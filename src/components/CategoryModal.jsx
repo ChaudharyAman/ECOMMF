@@ -8,7 +8,8 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
         parent: '',
         image: '',
         isActive: true,
-        isFeatured: false
+        isFeatured: false,
+        isOccasion: false
     });
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -20,7 +21,9 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
                 parent: category.parent?._id || category.parent || '',
                 image: category.image || '',
                 isActive: category.isActive !== undefined ? category.isActive : true,
-                isFeatured: category.isFeatured !== undefined ? category.isFeatured : false
+                isFeatured: category.isFeatured !== undefined ? category.isFeatured : false,
+                isOccasion: category.isOccasion !== undefined ? category.isOccasion : false,
+                isPromo: category.isPromo !== undefined ? category.isPromo : false
             });
         }
     }, [category]);
@@ -56,7 +59,7 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-                
+
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-stone-100 flex justify-between items-center bg-stone-50">
                     <div>
@@ -83,31 +86,31 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
 
                 {/* Form */}
                 <form id="category-form" onSubmit={handleSubmit} className="p-6 space-y-6">
-                    
+
                     <div>
                         <label className="text-xs font-semibold text-stone-500 uppercase mb-1 block">Category Name</label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Layers className="h-4 w-4 text-stone-400" />
                             </div>
-                            <input 
-                                required 
-                                name="name" 
-                                type="text" 
-                                placeholder="e.g. Electronics, Gift Cards" 
-                                value={formData.name} 
-                                onChange={handleChange} 
-                                className="w-full pl-10 pr-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-800 focus:border-stone-800 outline-none transition-shadow text-sm" 
+                            <input
+                                required
+                                name="name"
+                                type="text"
+                                placeholder="e.g. Electronics, Gift Cards"
+                                value={formData.name}
+                                onChange={handleChange}
+                                className="w-full pl-10 pr-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-800 focus:border-stone-800 outline-none transition-shadow text-sm"
                             />
                         </div>
                     </div>
 
                     <div>
                         <label className="text-xs font-semibold text-stone-500 uppercase mb-1 block">Parent Category (Optional)</label>
-                        <select 
-                            name="parent" 
-                            value={formData.parent} 
-                            onChange={handleChange} 
+                        <select
+                            name="parent"
+                            value={formData.parent}
+                            onChange={handleChange}
                             className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-800 focus:border-stone-800 outline-none transition-shadow text-sm bg-white"
                         >
                             <option value="">None (Top Level)</option>
@@ -118,18 +121,18 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
                     </div>
 
                     <div>
-                         <label className="text-xs font-semibold text-stone-500 uppercase mb-1 block">Image URL</label>
-                         <div className="relative">
+                        <label className="text-xs font-semibold text-stone-500 uppercase mb-1 block">Image URL</label>
+                        <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <ImageIcon className="h-4 w-4 text-stone-400" />
                             </div>
-                            <input 
-                                name="image" 
-                                type="url" 
-                                placeholder="https://example.com/image.jpg" 
-                                value={formData.image} 
-                                onChange={handleChange} 
-                                className="w-full pl-10 pr-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-800 focus:border-stone-800 outline-none transition-shadow text-sm" 
+                            <input
+                                name="image"
+                                type="url"
+                                placeholder="https://example.com/image.jpg"
+                                value={formData.image}
+                                onChange={handleChange}
+                                className="w-full pl-10 pr-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-800 focus:border-stone-800 outline-none transition-shadow text-sm"
                             />
                         </div>
                         {formData.image && (
@@ -139,27 +142,73 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
                         )}
                     </div>
 
+                    {formData.isPromo && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                            <label className="text-xs font-bold text-pink-600 uppercase mb-1 flex items-center gap-1">
+                                <ImageIcon className="w-3 h-3" /> Spotlight Banner Image URL (Optional)
+                            </label>
+                            <div className="relative">
+                                <input
+                                    name="promoImage"
+                                    type="url"
+                                    placeholder="High-res wide banner URL"
+                                    value={formData.promoImage || ''}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-shadow text-sm"
+                                />
+                            </div>
+                            {formData.promoImage && (
+                                <div className="mt-2 text-center">
+                                    <img src={formData.promoImage} alt="Promo Preview" className="h-20 w-fit mx-auto rounded-lg object-cover border border-pink-200 shadow-sm" />
+                                </div>
+                            )}
+                            <p className="text-[10px] text-stone-400 mt-1">Recommended aspect ratio 4:3 or wider. This will be shown natively as the homepage banner.</p>
+                        </div>
+                    )}
+
                     <div className="flex items-center gap-6">
-                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input 
-                                type="checkbox" 
-                                name="isActive" 
-                                checked={formData.isActive} 
-                                onChange={handleChange} 
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="isActive"
+                                checked={formData.isActive}
+                                onChange={handleChange}
                                 className="w-4 h-4 text-stone-800 rounded focus:ring-stone-800 border-gray-300"
                             />
                             <span className="text-sm font-medium text-stone-700">Active</span>
                         </label>
 
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input 
-                                type="checkbox" 
-                                name="isFeatured" 
-                                checked={formData.isFeatured} 
-                                onChange={handleChange} 
+                            <input
+                                type="checkbox"
+                                name="isFeatured"
+                                checked={formData.isFeatured}
+                                onChange={handleChange}
                                 className="w-4 h-4 text-stone-800 rounded focus:ring-stone-800 border-gray-300"
                             />
-                            <span className="text-sm font-medium text-stone-700">Featured</span>
+                            <span className="text-sm font-medium text-stone-700">Explore Collection</span>
+                        </label>
+
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="isOccasion"
+                                checked={formData.isOccasion}
+                                onChange={handleChange}
+                                className="w-4 h-4 text-stone-800 rounded focus:ring-stone-800 border-gray-300"
+                            />
+                            <span className="text-sm font-medium text-stone-700">Shop By Occasion</span>
+                        </label>
+
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="isPromo"
+                                checked={formData.isPromo}
+                                onChange={handleChange}
+                                className="w-4 h-4 text-stone-800 rounded focus:ring-stone-800 border-gray-300"
+                            />
+                            <span className="text-sm font-medium text-stone-700">Promote on Homepage</span>
                         </label>
                     </div>
 
@@ -167,15 +216,15 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
 
                 {/* Footer */}
                 <div className="px-6 py-4 border-t border-stone-100 bg-stone-50 flex justify-end gap-3">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         onClick={onClose}
                         className="px-5 py-2.5 text-stone-600 font-medium hover:bg-stone-200 rounded-lg transition-colors text-sm"
                     >
                         Cancel
                     </button>
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         form="category-form"
                         disabled={saving}
                         className="px-6 py-2.5 bg-stone-900 text-white font-bold rounded-lg hover:bg-stone-700 shadow-md shadow-stone-200 flex items-center gap-2 transform active:scale-95 transition-all text-sm"
