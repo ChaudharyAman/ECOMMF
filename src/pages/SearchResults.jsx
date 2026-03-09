@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../features/products/productSlice';
+import { fetchProducts, clearProducts } from '../features/products/productSlice';
 import { Search as SearchIcon, ArrowLeft, LayoutGrid } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 
@@ -13,10 +13,11 @@ const SearchResults = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
 
     useEffect(() => {
+        dispatch(clearProducts());
         if (query.trim()) {
             dispatch(fetchProducts(query));
         } else {
-             dispatch(fetchProducts());
+            dispatch(fetchProducts());
         }
     }, [dispatch, query]);
 
@@ -24,7 +25,7 @@ const SearchResults = () => {
     // The 'products' array from redux already contains the search results.
     useEffect(() => {
         if (products) {
-             setFilteredProducts(products);
+            setFilteredProducts(products);
         }
     }, [products]);
 
@@ -47,7 +48,7 @@ const SearchResults = () => {
                     <Link to="/" className="inline-flex items-center gap-2 text-stone-300 hover:text-white transition-colors text-sm font-medium mb-6">
                         <ArrowLeft className="w-4 h-4" /> Back to Home
                     </Link>
-                    
+
                     <div className="max-w-3xl">
                         <div className="flex items-center gap-3 mb-4">
                             <SearchIcon className="w-8 h-8 text-stone-400" />
@@ -79,7 +80,7 @@ const SearchResults = () => {
                                 Found <span className="font-bold text-stone-900">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'product' : 'products'}
                             </p>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {filteredProducts.map(product => (
                                 <ProductCard key={product._id} product={product} />
@@ -99,8 +100,8 @@ const SearchResults = () => {
                             <p className="text-sm text-stone-400 mb-6">
                                 Try different keywords or browse our categories
                             </p>
-                            <Link 
-                                to="/categories" 
+                            <Link
+                                to="/categories"
                                 className="inline-block px-6 py-2.5 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors font-medium text-sm"
                             >
                                 Browse Categories

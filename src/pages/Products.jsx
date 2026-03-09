@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../features/products/productSlice';
+import { fetchProducts, clearProducts } from '../features/products/productSlice';
 import { Loader2 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 
@@ -9,10 +9,9 @@ const Products = () => {
     const { products, loading } = useSelector((state) => state.products);
 
     useEffect(() => {
-        if (products.length === 0) {
-            dispatch(fetchProducts());
-        }
-    }, [dispatch, products.length]);
+        dispatch(clearProducts());
+        dispatch(fetchProducts());
+    }, [dispatch]);
 
     if (loading && products.length === 0) {
         return (
@@ -24,7 +23,7 @@ const Products = () => {
 
     return (
         <div className="min-h-screen bg-stone-50 py-12 px-6 lg:px-12 font-sans text-stone-800">
-             <div className="max-w-7xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16">
                     <span className="text-xs font-bold tracking-[0.2em] text-stone-500 uppercase mb-3 block">Shop All</span>
                     <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-6">Our Complete Collection</h1>
@@ -44,7 +43,7 @@ const Products = () => {
                         <p className="font-serif italic text-xl">No products found.</p>
                     </div>
                 )}
-             </div>
+            </div>
         </div>
     );
 };

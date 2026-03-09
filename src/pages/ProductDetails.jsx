@@ -12,18 +12,24 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const { products, relatedProducts, loading } = useSelector((state) => state.products);
   const { items: wishlistItems } = useSelector((state) => state.wishlist);
   const product = products.find(p => p._id === id);
-  
+
   const isInWishlist = product ? wishlistItems.some(item => item._id === product._id) : false;
-  
+
   const { items: cartItems } = useSelector((state) => state.cart);
   const isInCart = product ? cartItems.some(item => item.product._id === product._id) : false;
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  // Scroll to top whenever navigating to a new product
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+  }, [id]);
 
   useEffect(() => {
     if (products.length === 0) {
@@ -57,12 +63,12 @@ const ProductDetails = () => {
   };
 
   const handleToggleWishlist = () => {
-      dispatch(toggleWishlist(product));
-      if (isInWishlist) {
-          toast.success('Removed from wishlist');
-      } else {
-          toast.success('Added to wishlist');
-      }
+    dispatch(toggleWishlist(product));
+    if (isInWishlist) {
+      toast.success('Removed from wishlist');
+    } else {
+      toast.success('Added to wishlist');
+    }
   };
 
   const handleNextImage = () => {
@@ -131,7 +137,7 @@ const ProductDetails = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Back Button */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors mb-8 group"
         >
@@ -146,12 +152,12 @@ const ProductDetails = () => {
             <div className="relative aspect-square bg-stone-100 rounded-2xl overflow-hidden group">
               {images.length > 0 ? (
                 <>
-                  <img 
-                    src={images[selectedImage].url} 
+                  <img
+                    src={images[selectedImage].url}
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
-                  
+
                   {/* Image Navigation */}
                   {hasMultipleImages && (
                     <>
@@ -191,14 +197,13 @@ const ProductDetails = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                      selectedImage === index 
-                        ? 'border-stone-900 shadow-md' 
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index
+                        ? 'border-stone-900 shadow-md'
                         : 'border-stone-200 hover:border-stone-400'
-                    }`}
+                      }`}
                   >
-                    <img 
-                      src={image.url} 
+                    <img
+                      src={image.url}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -222,7 +227,7 @@ const ProductDetails = () => {
               <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4 leading-tight">
                 {product.name}
               </h1>
-              
+
               {/* Rating (Placeholder) */}
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
@@ -286,28 +291,25 @@ const ProductDetails = () => {
               <button
                 onClick={handleAddToCart}
                 disabled={product.stock === 0}
-                className={`flex-1 px-8 py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-3 shadow-lg ${
-                  isInCart 
-                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-green-900/20' 
+                className={`flex-1 px-8 py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-3 shadow-lg ${isInCart
+                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-green-900/20'
                     : 'bg-stone-900 hover:bg-stone-800 text-white shadow-stone-900/20 hover:shadow-stone-900/30'
-                } disabled:bg-stone-300 disabled:cursor-not-allowed disabled:shadow-none`}
+                  } disabled:bg-stone-300 disabled:cursor-not-allowed disabled:shadow-none`}
               >
                 {isInCart ? <ArrowRight className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5" />}
                 {product.stock === 0 ? 'Out of Stock' : isInCart ? 'Go to Cart' : 'Add to Cart'}
               </button>
-              <button 
-                  onClick={handleToggleWishlist}
-                  className={`p-4 border-2 rounded-lg transition-all group ${
-                      isInWishlist 
-                      ? 'border-red-200 bg-red-50' 
-                      : 'border-stone-200 hover:border-stone-900 hover:bg-stone-50'
+              <button
+                onClick={handleToggleWishlist}
+                className={`p-4 border-2 rounded-lg transition-all group ${isInWishlist
+                    ? 'border-red-200 bg-red-50'
+                    : 'border-stone-200 hover:border-stone-900 hover:bg-stone-50'
                   }`}
               >
-                <Heart className={`w-5 h-5 transition-all ${
-                    isInWishlist 
-                    ? 'text-red-500 fill-red-500' 
+                <Heart className={`w-5 h-5 transition-all ${isInWishlist
+                    ? 'text-red-500 fill-red-500'
                     : 'text-stone-600 group-hover:text-red-500 group-hover:fill-red-500'
-                }`} />
+                  }`} />
               </button>
               <button className="p-4 border-2 border-stone-200 rounded-lg hover:border-stone-900 hover:bg-stone-50 transition-all">
                 <Share2 className="w-5 h-5 text-stone-600" />
@@ -380,7 +382,7 @@ const ProductDetails = () => {
                 <p className="text-stone-600">Similar products from the same collection</p>
               </div>
               {product.category && (
-                <Link 
+                <Link
                   to={`/category/${product.category._id || product.category}`}
                   className="text-sm font-semibold text-stone-900 hover:text-stone-600 transition-colors underline"
                 >
@@ -394,8 +396,8 @@ const ProductDetails = () => {
                 .filter(p => p._id !== product._id)
                 .slice(0, 4)
                 .map(relatedProduct => (
-                <ProductCard key={relatedProduct._id} product={relatedProduct} />
-              ))}
+                  <ProductCard key={relatedProduct._id} product={relatedProduct} />
+                ))}
             </div>
           </div>
         )}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, fetchCategories } from '../features/products/productSlice';
+import { fetchProducts, fetchCategories, clearProducts } from '../features/products/productSlice';
 import { useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, SlidersHorizontal, Grid3x3, LayoutGrid, ChevronDown, List, LayoutList } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -27,6 +27,7 @@ const CategoryProducts = () => {
         setFilteredProducts([]);
         setSelectedSubCat('all');
         setPriceRange('all');
+        dispatch(clearProducts()); // Clear products synchronously so old search results don't flash
         dispatch(fetchProducts({ category: id, limit: 1000 }));
 
         if (categories.length === 0) dispatch(fetchCategories());

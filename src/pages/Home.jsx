@@ -32,53 +32,85 @@ const Home = () => {
 
             {/* --- Promotional Category Banner (Top Priority) --- */}
             {promoCategory && (
-                <section className="w-full pt-[80px] pb-2 px-4 sm:px-8 lg:px-12 bg-[#FDFBF7]">
-                    <div className="max-w-[1400px] mx-auto relative rounded-3xl overflow-hidden h-[240px] sm:h-[320px] md:h-[400px] flex items-stretch group cursor-pointer shadow-2xl shadow-stone-300/40">
+                <section className="relative z-10 w-full pt-[80px] bg-[#2D281E] overflow-hidden">
+                    <div className="w-full relative h-[220px] sm:h-[260px] md:h-[300px] flex items-stretch group cursor-pointer">
                         <Link to={`/category/${promoCategory._id}`} className="absolute inset-0 z-20"></Link>
 
-                        {/* Left: Warm Rich Text Panel */}
-                        <div className="relative z-10 flex flex-col justify-center py-8 px-8 md:px-14 w-[55%] md:w-[48%] bg-gradient-to-br from-[#1a1208] via-[#2c1f0e] to-[#3d2b12] flex-shrink-0">
-                            {/* Decorative ribbon corner */}
-                            <div className="absolute top-4 right-4 md:top-6 md:right-6 opacity-30">
-                                <Gift className="w-8 h-8 md:w-12 md:h-12 text-amber-300" />
-                            </div>
-                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none"></div>
+                        {/* Left: Elegant Dark Text Panel */}
+                        <div className="relative z-10 flex flex-col justify-center py-6 px-6 sm:px-12 md:px-20 w-[70%] md:w-[50%] flex-shrink-0">
 
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/30 mb-4 w-fit">
-                                <Star className="w-3 h-3 text-amber-300 fill-amber-300" />
-                                <span className="text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-amber-200">Curated Spotlight</span>
+                            {/* Premium Spotlight Badge */}
+                            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-stone-800/50 border border-stone-700/50 shadow-lg mb-4 w-fit">
+                                <Star className="w-3 h-3 text-[#FFD55F] fill-[#FFD55F]" />
+                                <span className="text-[9px] md:text-xs font-bold tracking-[0.2em] uppercase text-stone-200">Curated Spotlight</span>
                             </div>
 
-                            <h2 className="text-2xl sm:text-3xl md:text-5xl font-serif text-white leading-snug mb-2 md:mb-4">
-                                The <span className="italic text-amber-200">{promoCategory.name}</span><br />
-                                <span className="text-white/60 text-xl md:text-3xl">Collection</span>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-white tracking-tight leading-[1.1] mb-3">
+                                The <span className="italic font-light text-[#FFD55F]">HandCrafted</span> <br />
+                                Collection
                             </h2>
 
-                            <p className="hidden md:block text-sm text-amber-100/70 font-light mb-6 leading-relaxed max-w-xs">
-                                Thoughtfully curated for those who give with intention. Discover something unforgettable.
+                            <p className="text-sm md:text-base text-stone-300 font-light mb-6 sm:mb-8 line-clamp-2 max-w-md leading-relaxed">
+                                Thoughtfully curated for those who give with intention. <br className="hidden md:block" />
+                                Discover something unforgettable.
                             </p>
 
-                            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-300 text-stone-900 rounded-full font-bold uppercase tracking-widest text-[10px] md:text-xs shadow-lg hover:bg-amber-200 transition-colors w-fit">
-                                Shop the Collection <ArrowRight className="w-3.5 h-3.5" />
+                            {/* Premium Yellow Button */}
+                            <div className="inline-flex items-center gap-2 bg-[#FFD55F] text-stone-950 px-6 py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest hover:bg-[#ffcd3c] hover:scale-105 transition-all w-fit shadow-xl shadow-yellow-500/20 uppercase border border-yellow-400/20">
+                                Shop The Collection
+                                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </div>
 
-                        {/* Right: Image */}
-                        <div className="flex-1 relative overflow-hidden">
-                            <img
-                                src={promoCategory.promoImage || promoCategory.image || promoCategory.featuredProduct?.images?.[0]?.url || 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?q=80&w=2670&auto=format&fit=crop'}
-                                alt={promoCategory.name}
-                                className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[12s] ease-out group-hover:scale-110"
-                            />
-                            {/* Left edge feather into the dark panel */}
-                            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#2c1f0e] to-transparent"></div>
+                        {/* Right: Modern Image Panel - Full bleed with mask */}
+                        <div className="absolute inset-y-0 right-0 w-[55%] md:w-[65%] overflow-hidden z-0 flex justify-end">
+                            {promoCategory.image ? (
+                                <div
+                                    className="w-full h-full relative"
+                                    style={{
+                                        WebkitMaskImage: 'linear-gradient(to right, transparent, black 15% 90%, transparent)',
+                                        maskImage: 'linear-gradient(to right, transparent, black 15% 90%, transparent)'
+                                    }}
+                                >
+                                    <img
+                                        src={promoCategory.image}
+                                        alt={promoCategory.name}
+                                        className="w-full h-full object-cover object-left-center group-hover:scale-105 transition-transform duration-1000 ease-out"
+                                    />
+                                </div>
+                            ) : (
+                                <div
+                                    className="w-full h-full bg-[#3d382d] flex items-center justify-center"
+                                    style={{
+                                        WebkitMaskImage: 'linear-gradient(to right, transparent, black 40%)',
+                                        maskImage: 'linear-gradient(to right, transparent, black 40%)'
+                                    }}
+                                >
+                                    <Gift className="w-20 h-20 text-[#FFD55F] opacity-20" />
+                                </div>
+                            )}
                         </div>
+                    </div>
+
+                    {/* Seamless Wavy Transition - Gap-free overlap */}
+                    <div className="absolute bottom-[-2px] left-0 w-full overflow-hidden leading-[0] z-20 pointer-events-none">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 1440 60"
+                            preserveAspectRatio="none"
+                            className="block w-full h-[30px] md:h-[50px] scale-x-105"
+                        >
+                            <path
+                                d="M0,60 L0,30 Q60,45 120,30 Q180,15 240,30 Q300,45 360,30 Q420,15 480,30 Q540,45 600,30 Q660,15 720,30 Q780,45 840,30 Q900,15 960,30 Q1020,45 1080,30 Q1140,15 1200,30 Q1260,45 1320,30 Q1380,15 1440,30 L1440,60 Z"
+                                fill="#FDFBF7"
+                            />
+                        </svg>
                     </div>
                 </section>
             )}
 
             {/* --- Hero: Emotional & Warm --- */}
-            <section className={`relative flex items-center justify-center px-6 overflow-hidden ${promoCategory ? 'min-h-[50vh] pb-24 pt-12' : 'min-h-[85vh] pb-24 pt-32'}`}>
+            <section className={`relative flex items-center justify-center px-6 overflow-hidden ${promoCategory ? 'min-h-[40vh] pb-24 pt-0 -mt-1' : 'min-h-[85vh] pb-24 pt-32'}`}>
                 <div className="absolute inset-0 z-0">
                     <img
                         src="https://images.unsplash.com/photo-1513201099705-a9746e1e201f?q=80&w=2574&auto=format&fit=crop"
@@ -113,10 +145,23 @@ const Home = () => {
                         </Link>
                     </div>
                 </div>
+
+                {/* Wavy bottom divider spanning full width */}
+                <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-10 pointer-events-none transform translate-y-[99%]">
+                    <svg
+                        className="relative block w-[calc(100%+1.3px)] h-[40px] md:h-[70px] fill-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 1200 120"
+                        preserveAspectRatio="none"
+                    >
+                        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C50.69,16.59,102.58,35.79,154.2,46.51A481.56,481.56,0,0,0,321.39,56.44Z"></path>
+                    </svg>
+                </div>
             </section>
 
             {/* --- Gift Finder Module (Categories) --- */}
-            <section className="relative z-20 -mt-20 px-6 lg:px-12">
+            {/* Added pt-10 to account for the wave bleeding down into this section */}
+            <section className="relative z-20 px-6 lg:px-12 bg-white pt-10 pb-20">
                 <div className="max-w-5xl mx-auto bg-white rounded-3xl p-8 md:p-12 shadow-xl shadow-stone-200/50 border border-t-stone-100">
                     <h2 className="text-center font-serif text-3xl mb-10 text-stone-800">Explore Our Collections</h2>
 

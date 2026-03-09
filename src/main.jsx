@@ -4,6 +4,11 @@ import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { store } from './app/store'
+
+// Disable browser scroll restoration so React Router handles it
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
 import './index.css'
 import Layout from './layouts/Layout'
 import Auth from './pages/Auth'
@@ -68,22 +73,22 @@ const router = createBrowserRouter([
         path: 'admin',
         element: <AdminRoute />,
         children: [
-            {
-                index: true,
-                element: <AdminDashboard />
-            },
-            {
-                path: 'moderation',
-                element: <ProductModeration />
-            },
-            {
-                path: 'vendors',
-                element: <VendorManagement />
-            },
-            {
-                path: 'categories',
-                element: <CategoryManagement />
-            }
+          {
+            index: true,
+            element: <AdminDashboard />
+          },
+          {
+            path: 'moderation',
+            element: <ProductModeration />
+          },
+          {
+            path: 'vendors',
+            element: <VendorManagement />
+          },
+          {
+            path: 'categories',
+            element: <CategoryManagement />
+          }
         ]
       },
       {
