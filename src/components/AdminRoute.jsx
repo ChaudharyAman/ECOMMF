@@ -23,6 +23,8 @@ const AdminRoute = () => {
                     <p className="text-stone-600">Loading...</p>
                 </div>
             </div>
+
+
         );
     }
 

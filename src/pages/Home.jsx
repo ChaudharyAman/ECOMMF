@@ -30,8 +30,42 @@ const Home = () => {
     return (
         <div className="font-sans text-stone-800 bg-[#FDFBF7] min-h-screen">
 
+            {/* --- Promotional Category Banner (Top Priority) --- */}
+            {promoCategory && (
+                <section className="w-full pt-20 pb-4 px-4 sm:px-6 lg:px-8 bg-[#FDFBF7]">
+                    <div className="max-w-[1600px] mx-auto relative rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-lg h-[250px] sm:h-[350px] md:h-[450px] flex items-center group cursor-pointer">
+                        <Link to={`/category/${promoCategory._id}`} className="absolute inset-0 z-20"></Link>
+                        <img
+                            src={promoCategory.promoImage || promoCategory.image || promoCategory.featuredProduct?.images?.[0]?.url || 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?q=80&w=2670&auto=format&fit=crop'}
+                            alt={promoCategory.name}
+                            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[10s] ease-out group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-stone-900/80 via-stone-900/30 to-transparent"></div>
+
+                        <div className="relative z-10 px-6 md:px-12 lg:px-20 max-w-2xl text-white">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md mb-3 md:mb-6 border border-white/20 shadow-sm">
+                                <Star className="w-3 md:w-4 h-3 md:h-4 text-amber-300 fill-amber-300" />
+                                <span className="text-[10px] md:text-xs font-bold tracking-wider uppercase drop-shadow-sm">Spotlight</span>
+                            </div>
+
+                            <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif leading-tight mb-2 md:mb-4 drop-shadow-md">
+                                <span className="italic text-amber-100">{promoCategory.name}</span>
+                            </h2>
+
+                            <p className="hidden md:block text-base md:text-lg text-white/90 font-light mb-6 md:mb-8 max-w-md drop-shadow">
+                                Hand-picked treasures curated exclusively for your perfect gesture.
+                            </p>
+
+                            <div className="inline-flex items-center gap-2 px-5 py-2.5 md:px-8 md:py-4 bg-white text-stone-900 rounded-full font-bold uppercase tracking-wider group-hover:bg-stone-100 transition-colors text-[10px] md:text-sm shadow-xl">
+                                Shop Now <ArrowRight className="w-3.5 h-3.5 md:w-5 md:h-5" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* --- Hero: Emotional & Warm --- */}
-            <section className="relative min-h-[85vh] flex items-center justify-center px-6 pb-24 pt-32 overflow-hidden">
+            <section className={`relative flex items-center justify-center px-6 overflow-hidden ${promoCategory ? 'min-h-[50vh] pb-24 pt-12' : 'min-h-[85vh] pb-24 pt-32'}`}>
                 <div className="absolute inset-0 z-0">
                     <img
                         src="https://images.unsplash.com/photo-1513201099705-a9746e1e201f?q=80&w=2574&auto=format&fit=crop"
@@ -41,23 +75,23 @@ const Home = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] via-transparent to-transparent"></div>
                 </div>
 
-                <div className="relative z-10 text-center max-w-4xl mx-auto space-y-8 animate-fade-in-up mt-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-stone-200 shadow-sm mb-4">
+                <div className="relative z-10 text-center max-w-4xl mx-auto space-y-6 md:space-y-8 animate-fade-in-up mt-10">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-stone-200 shadow-sm mb-2 md:mb-4">
                         <Gift className="w-4 h-4 text-amber-500" />
                         <span className="text-xs font-bold tracking-widest uppercase text-stone-600">The Art of Meaningful Gifting</span>
                     </div>
 
-                    <h1 className="text-6xl md:text-8xl font-serif text-stone-900 leading-tight">
+                    <h1 className={`${promoCategory ? 'text-5xl md:text-7xl' : 'text-6xl md:text-8xl'} font-serif text-stone-900 leading-tight`}>
                         Find the <br />
                         <span className="italic text-stone-500">Perfect</span> Gesture.
                     </h1>
 
-                    <p className="text-xl text-stone-600 font-light max-w-2xl mx-auto leading-relaxed">
+                    <p className={`${promoCategory ? 'text-lg md:text-xl' : 'text-xl'} text-stone-600 font-light max-w-2xl mx-auto leading-relaxed`}>
                         Thoughtfully curated collections for the people who matter most.
                         Make every occasion unforgettable with a hand-picked treasure.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 md:pt-6">
                         <Link to="/categories" className="px-10 py-4 bg-stone-900 text-white rounded-full font-medium hover:bg-stone-800 transition-all hover:scale-105 shadow-lg shadow-stone-900/10">
                             Find a Gift
                         </Link>
@@ -67,40 +101,6 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-
-            {/* --- Promotional Category Banner --- */}
-            {promoCategory && (
-                <section className="py-24 px-6 lg:px-12 relative overflow-hidden bg-[#FDFBF7]">
-                    <div className="max-w-[1400px] mx-auto relative rounded-[2.5rem] overflow-hidden shadow-2xl h-[500px] md:h-[600px] flex items-center group">
-                        <img
-                            src={promoCategory.promoImage || promoCategory.image || promoCategory.featuredProduct?.images?.[0]?.url || 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?q=80&w=2670&auto=format&fit=crop'}
-                            alt={promoCategory.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[15s] ease-out group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-stone-900/90 via-stone-900/50 to-transparent"></div>
-                        <div className="absolute inset-0 bg-stone-900/10 mix-blend-multiply"></div>
-
-                        <div className="relative z-10 px-8 md:px-20 lg:px-24 max-w-3xl text-white">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8 animate-fade-in-up">
-                                <Star className="w-4 h-4 text-amber-300 fill-amber-300" />
-                                <span className="text-xs font-bold tracking-widest uppercase text-white drop-shadow-sm">Curated Spotlight</span>
-                            </div>
-
-                            <h2 className="text-5xl md:text-7xl font-serif leading-tight mb-6 drop-shadow-lg">
-                                The <span className="italic text-amber-100">{promoCategory.name}</span> <br />Collection
-                            </h2>
-
-                            <p className="text-lg md:text-xl text-white/90 font-light mb-10 leading-relaxed max-w-xl text-shadow-sm">
-                                Elevate your gifting with our most prestigious selection. meticulously curated for those who appreciate the finer things in life.
-                            </p>
-
-                            <Link to={`/category/${promoCategory._id}`} className="inline-flex items-center gap-3 px-8 py-4 bg-white text-stone-900 rounded-full font-bold uppercase tracking-widest hover:bg-stone-100 hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.3)]">
-                                Discover Now <ArrowRight className="w-5 h-5" />
-                            </Link>
-                        </div>
-                    </div>
-                </section>
-            )}
 
             {/* --- Gift Finder Module (Categories) --- */}
             <section className="relative z-20 -mt-20 px-6 lg:px-12">
