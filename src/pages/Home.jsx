@@ -33,7 +33,7 @@ const Home = () => {
             {/* --- Promotional Category Banner (Top Priority) --- */}
             {promoCategory && (
                 <section className="relative z-10 w-full pt-[80px] bg-[#2D281E] overflow-hidden">
-                    <div className="w-full relative h-[220px] sm:h-[260px] md:h-[300px] flex items-stretch group cursor-pointer">
+                    <div className="w-full relative h-[160px] sm:h-[190px] md:h-[220px] flex items-stretch group cursor-pointer">
                         <Link to={`/category/${promoCategory._id}`} className="absolute inset-0 z-20"></Link>
 
                         {/* Left: Elegant Dark Text Panel */}
@@ -45,12 +45,12 @@ const Home = () => {
                                 <span className="text-[9px] md:text-xs font-bold tracking-[0.2em] uppercase text-stone-200">Curated Spotlight</span>
                             </div>
 
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-white tracking-tight leading-[1.1] mb-3">
-                                The <span className="italic font-light text-[#FFD55F]">HandCrafted</span> <br />
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white tracking-tight leading-[1.1] mb-3">
+                                The <span className="italic font-light text-[#FFD55F]">{promoCategory.name}</span> <br />
                                 Collection
                             </h2>
 
-                            <p className="text-sm md:text-base text-stone-300 font-light mb-6 sm:mb-8 line-clamp-2 max-w-md leading-relaxed">
+                            <p className="text-sm md:text-base text-stone-300 font-light mb-3 sm:mb-4 line-clamp-2 max-w-md leading-relaxed">
                                 Thoughtfully curated for those who give with intention. <br className="hidden md:block" />
                                 Discover something unforgettable.
                             </p>
