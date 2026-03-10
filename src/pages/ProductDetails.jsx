@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, fetchProductsByCategory } from '../features/products/productSlice';
+import { fetchProducts, fetchProductsByCategory, fetchProductById } from '../features/products/productSlice';
 import { addToCart } from '../features/cart/cartSlice';
 import { toggleWishlist } from '../features/wishlist/wishlistSlice';
 import { ArrowLeft, ShoppingCart, Heart, Share2, Package, Truck, ShieldCheck, RefreshCw, Star, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
@@ -15,7 +15,9 @@ const ProductDetails = () => {
 
   const { products, relatedProducts, loading } = useSelector((state) => state.products);
   const { items: wishlistItems } = useSelector((state) => state.wishlist);
-  const product = products.find(p => p._id === id);
+  
+  // Find product in products or relatedProducts to avoid flashing "Not Found" while fetching
+  const product = products.find(p => p._id === id) || relatedProducts.find(p => p._id === id);
 
   const isInWishlist = product ? wishlistItems.some(item => item._id === product._id) : false;
 
@@ -32,16 +34,18 @@ const ProductDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    if (products.length === 0) {
-      dispatch(fetchProducts());
+    // Always fetch the fresh product details when the ID changes
+    if (id) {
+      dispatch(fetchProductById(id));
     }
-  }, [dispatch, products.length]);
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (product && product.images && product.images.length > 0) {
       setSelectedImage(0);
+      setQuantity(1); // Reset quantity too when product changes
     }
-  }, [product]);
+  }, [product?._id]); // Depend on product ID rather than the whole product object to avoid unnecessary resets
 
   // Get related products from same category
   useEffect(() => {
