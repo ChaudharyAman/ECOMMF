@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Eye } from 'lucide-react';
+import { ShoppingBag, Eye, Star } from 'lucide-react';
 
 const ProductCard = ({ product }) => {
     return (
@@ -20,8 +20,16 @@ const ProductCard = ({ product }) => {
                 
                 {/* Stock Badge */}
                 {product.stock === 0 && (
-                    <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 text-xs font-bold rounded-full">
+                    <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 text-xs font-bold rounded-full z-10">
                         SOLD OUT
+                    </div>
+                )}
+
+                {/* Featured Badge */}
+                {product.isFeatured && (
+                    <div className="absolute top-4 left-4 bg-amber-400 text-stone-900 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg border border-amber-300 z-10 flex items-center gap-1.5 animate-pulse">
+                        <Star className="w-3 h-3 fill-stone-900" />
+                        Featured
                     </div>
                 )}
 

@@ -17,7 +17,13 @@ const Home = () => {
     const exploreCollections = categories.filter(c => c.isFeatured).slice(0, 3);
     const occasionCollections = categories.filter(c => c.isOccasion).slice(0, 4);
     const promoCategory = categories.find(c => c.isPromo);
-    const trendingProducts = products.slice(0, 4);
+    
+    // Logic for Featured vs Trending
+    const featuredProduct = products.find(p => p.isFeatured) || products[0];
+    const trendingProducts = products.filter(p => !p.isFeatured && p._id !== featuredProduct?._id).slice(0, 4);
+    
+    // Fallback if no trending products left (e.g. only one product exists)
+    const displayTrending = trendingProducts.length > 0 ? trendingProducts : products.filter(p => p._id !== featuredProduct?._id).slice(0, 4);
 
     if (loading && products.length === 0) {
         return (
@@ -210,17 +216,17 @@ const Home = () => {
             </section>
 
             {/* --- Featured Treasure & Packaging Experience (Consolidated) --- */}
-            {trendingProducts.length > 0 && (
+            {featuredProduct && (
                 <section className="py-24 bg-white border-y border-stone-100">
                     <div className="max-w-[1400px] mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
 
                         {/* Interactive Image Side */}
                         <div className="order-2 md:order-1 relative aspect-[4/3] rounded-3xl overflow-hidden bg-stone-100 group cursor-pointer shadow-xl">
                             {/* The Actual Product (Revealed) */}
-                            <Link to={`/product/${trendingProducts[0]?._id}`} className="absolute inset-0 z-10">
+                            <Link to={`/product/${featuredProduct._id}`} className="absolute inset-0 z-10">
                                 <img
-                                    src={trendingProducts[0]?.images?.[0]?.url || ''}
-                                    alt={trendingProducts[0]?.name}
+                                    src={featuredProduct.images?.[0]?.url || ''}
+                                    alt={featuredProduct.name}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                                 <div className="absolute bottom-6 left-6 right-6">
@@ -228,7 +234,7 @@ const Home = () => {
                                         <div className="flex justify-between items-center">
                                             <div>
                                                 <p className="text-xs font-bold uppercase tracking-wider text-stone-500">Unwrapped For You</p>
-                                                <p className="font-serif text-lg text-stone-900">{trendingProducts[0]?.name}</p>
+                                                <p className="font-serif text-lg text-stone-900">{featuredProduct.name}</p>
                                             </div>
                                             <span className="bg-stone-900 text-white rounded-full p-2">
                                                 <ArrowRight className="w-4 h-4" />
@@ -291,7 +297,7 @@ const Home = () => {
                             </ul>
 
                             <div className="pt-6">
-                                <Link to={`/product/${trendingProducts[0]?._id}`} className="text-sm font-bold uppercase tracking-widest text-stone-900 border-b border-stone-900 pb-1 hover:text-stone-600 hover:border-stone-600 transition-colors">
+                                <Link to={`/product/${featuredProduct._id}`} className="text-sm font-bold uppercase tracking-widest text-stone-900 border-b border-stone-900 pb-1 hover:text-stone-600 hover:border-stone-600 transition-colors">
                                     Shop the Featured Gift
                                 </Link>
                             </div>
@@ -314,7 +320,7 @@ const Home = () => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {trendingProducts.map(product => (
+                        {displayTrending.map(product => (
                             <ProductCard key={product._id} product={product} />
                         ))}
                     </div>
