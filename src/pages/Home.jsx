@@ -69,7 +69,7 @@ const Home = () => {
 
 
                             {/* Premium Yellow Button */}
-                            <div className="inline-flex items-center gap-2 bg-[#FFD55F] text-stone-950 px-6 py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest hover:bg-[#ffcd3c] hover:scale-105 transition-all w-fit shadow-xl shadow-yellow-500/20 uppercase border border-yellow-400/20">
+                            <div className="inline-flex items-center gap-2 bg-[#FFD55F] text-stone-950 px-4 py-2 rounded-full text-[10px] md:text-xs font-black tracking-widest hover:bg-[#ffcd3c] hover:scale-105 transition-all w-fit shadow-xl shadow-yellow-500/20 uppercase border border-yellow-400/20">
                                 Shop The Collection
                                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                             </div>
