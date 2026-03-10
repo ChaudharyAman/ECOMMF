@@ -39,7 +39,7 @@ const Home = () => {
             {/* --- Promotional Category Banner (Top Priority) --- */}
             {promoCategory && (
                 <section 
-                    className="relative z-20 w-full pt-[64px] bg-[#2D281E] overflow-visible"
+                    className="relative z-20 w-full pt-[48px] bg-[#2D281E] overflow-visible"
                     style={{
                         maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0,240 Q60,250 120,240 T240,240 T360,240 T480,240 T600,240 T720,240 T840,240 T960,240 T1080,240 T1200,240 T1320,240 T1440,240L1440,0L0,0Z'/%3E%3C/svg%3E")`,
                         WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0,240 Q60,250 120,240 T240,240 T360,240 T480,240 T600,240 T720,240 T840,240 T960,240 T1080,240 T1200,240 T1320,240 T1440,240L1440,0L0,0Z'/%3E%3C/svg%3E")`,
@@ -54,24 +54,24 @@ const Home = () => {
                         <Link to={`/category/${promoCategory._id}`} className="absolute inset-0 z-20"></Link>
 
                         {/* Left: Elegant Dark Text Panel */}
-                        <div className="relative z-10 flex flex-col justify-center py-4 px-6 sm:px-12 md:px-20 w-[70%] md:w-[50%] flex-shrink-0">
+                        <div className="relative z-10 flex flex-col justify-center pt-1 pb-4 px-6 sm:px-12 md:px-20 w-[70%] md:w-[50%] flex-shrink-0">
 
                             {/* Premium Spotlight Badge */}
                             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-stone-800/50 border border-stone-700/50 shadow-lg mb-2 w-fit">
                                 <Star className="w-3 h-3 text-[#FFD55F] fill-[#FFD55F]" />
-                                <span className="text-[9px] md:text-xs font-bold tracking-[0.2em] uppercase text-stone-200">Curated Spotlight</span>
+                                <span className="text-[7.5px] md:text-[9px] font-bold tracking-[0.2em] uppercase text-stone-200">Curated Spotlight</span>
                             </div>
 
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white tracking-tight leading-[1.1] mb-1">
+                            <h2 className="text-lg sm:text-xl md:text-2xl font-serif text-white tracking-tight leading-[1.1] mb-1">
                                 The <span className="italic font-light text-[#FFD55F]">{promoCategory.name}</span> Collection
                             </h2>
 
 
 
                             {/* Premium Yellow Button */}
-                            <div className="inline-flex items-center gap-2 bg-[#FFD55F] text-stone-950 px-4 py-2 rounded-full text-[10px] md:text-xs font-black tracking-widest hover:bg-[#ffcd3c] hover:scale-105 transition-all w-fit shadow-xl shadow-yellow-500/20 uppercase border border-yellow-400/20">
+                            <div className="inline-flex items-center gap-2 bg-[#FFD55F] text-stone-950 px-3 py-1.5 rounded-full text-[9px] md:text-[10px] font-black tracking-widest hover:bg-[#ffcd3c] hover:scale-105 transition-all w-fit shadow-xl shadow-yellow-500/20 uppercase border border-yellow-400/20">
                                 Shop The Collection
-                                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </div>
 
