@@ -129,7 +129,6 @@ const About = () => {
                             /* Placeholder for signature. In real app, use asset. Using text fallback for now if image fails. */
                             onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='block'}}
                          />
-                         <p className="font-serif text-2xl italic text-stone-400 hidden mt-4">The E-Shop Team</p>
                      </div>
                  </div>
             </section>

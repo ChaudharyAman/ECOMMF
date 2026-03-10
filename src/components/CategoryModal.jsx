@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, AlertTriangle, Layers, Image as ImageIcon } from 'lucide-react';
+import { X, Save, AlertTriangle, Layers, Image as ImageIcon, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
@@ -7,10 +7,21 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
         name: '',
         parent: '',
         image: '',
+        promoImage: '',
         isActive: true,
         isFeatured: false,
-        isOccasion: false
+        isOccasion: false,
+        isPromo: false
     });
+    const [selectedFiles, setSelectedFiles] = useState({
+        image: null,
+        promoImage: null
+    });
+    const [previews, setPreviews] = useState({
+        image: null,
+        promoImage: null
+    });
+
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
@@ -20,11 +31,14 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
                 name: category.name || '',
                 parent: category.parent?._id || category.parent || '',
                 image: category.image || '',
+                promoImage: category.promoImage || '',
                 isActive: category.isActive !== undefined ? category.isActive : true,
                 isFeatured: category.isFeatured !== undefined ? category.isFeatured : false,
                 isOccasion: category.isOccasion !== undefined ? category.isOccasion : false,
                 isPromo: category.isPromo !== undefined ? category.isPromo : false
             });
+            setPreviews({ image: null, promoImage: null });
+            setSelectedFiles({ image: null, promoImage: null });
         }
     }, [category]);
 
@@ -34,15 +48,47 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
         if (error) setError('');
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const name = e.target.name; // 'image' or 'promoImage'
+            setSelectedFiles(prev => ({ ...prev, [name]: file }));
+            setPreviews(prev => ({ ...prev, [name]: URL.createObjectURL(file) }));
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
-            // Convert empty string parent to null for backend
-            const submissionData = {
-                ...formData,
-                parent: formData.parent === '' ? null : formData.parent
-            };
+            let submissionData;
+
+            // If any files are selected, use FormData
+            if (selectedFiles.image || selectedFiles.promoImage) {
+                submissionData = new FormData();
+                submissionData.append('name', formData.name);
+                submissionData.append('parent', (formData.parent === '' || formData.parent === null) ? 'null' : formData.parent);
+                submissionData.append('image', formData.image);
+                submissionData.append('promoImage', formData.promoImage);
+                submissionData.append('isActive', formData.isActive);
+                submissionData.append('isFeatured', formData.isFeatured);
+                submissionData.append('isOccasion', formData.isOccasion);
+                submissionData.append('isPromo', formData.isPromo);
+
+                if (selectedFiles.image) {
+                    submissionData.append('imageFile', selectedFiles.image);
+                }
+                if (selectedFiles.promoImage) {
+                    submissionData.append('promoImageFile', selectedFiles.promoImage);
+                }
+            } else {
+                // Otherwise use plain object as before
+                submissionData = {
+                    ...formData,
+                    parent: formData.parent === '' ? null : formData.parent
+                };
+            }
+
             await onSave(submissionData);
             onClose();
         } catch (err) {
@@ -85,7 +131,7 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
                 )}
 
                 {/* Form */}
-                <form id="category-form" onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form id="category-form" onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
 
                     <div>
                         <label className="text-xs font-semibold text-stone-500 uppercase mb-1 block">Category Name</label>
@@ -121,48 +167,97 @@ const CategoryModal = ({ category, onClose, onSave, categories = [] }) => {
                     </div>
 
                     <div>
-                        <label className="text-xs font-semibold text-stone-500 uppercase mb-1 block">Image URL</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <ImageIcon className="h-4 w-4 text-stone-400" />
+                        <label className="text-xs font-semibold text-stone-500 uppercase mb-1 block">Category Image</label>
+                        <div className="space-y-3">
+                            {/* URL Input */}
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <ImageIcon className="h-4 w-4 text-stone-400" />
+                                </div>
+                                <input
+                                    name="image"
+                                    type="url"
+                                    placeholder="Image URL (optional)"
+                                    value={formData.image}
+                                    onChange={handleChange}
+                                    className="w-full pl-10 pr-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-800 focus:border-stone-800 outline-none transition-shadow text-sm"
+                                />
                             </div>
-                            <input
-                                name="image"
-                                type="url"
-                                placeholder="https://example.com/image.jpg"
-                                value={formData.image}
-                                onChange={handleChange}
-                                className="w-full pl-10 pr-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-stone-800 focus:border-stone-800 outline-none transition-shadow text-sm"
-                            />
+
+                            {/* File Upload */}
+                            <div className="flex items-center gap-3">
+                                <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-stone-200 rounded-lg hover:border-stone-400 cursor-pointer transition-colors text-stone-500 hover:text-stone-700">
+                                    <Upload className="w-4 h-4" />
+                                    <span className="text-xs font-semibold">{selectedFiles.image ? selectedFiles.image.name : 'Upload Category Image'}</span>
+                                    <input
+                                        type="file"
+                                        name="image"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                    />
+                                </label>
+                            </div>
+
+                            {(previews.image || formData.image) && (
+                                <div className="mt-2 text-center relative group">
+                                    <img 
+                                        src={previews.image || formData.image} 
+                                        alt="Preview" 
+                                        className="h-20 mx-auto rounded-lg object-cover border border-stone-100 shadow-sm" 
+                                    />
+                                    <p className="text-[10px] text-stone-400 mt-1 font-medium">{previews.image ? 'New upload preview' : 'Current image'}</p>
+                                </div>
+                            )}
                         </div>
-                        {formData.image && (
-                            <div className="mt-2 text-center">
-                                <img src={formData.image} alt="Preview" className="h-20 mx-auto rounded-lg object-cover border border-stone-200" />
-                            </div>
-                        )}
                     </div>
 
                     {formData.isPromo && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                            <label className="text-xs font-bold text-pink-600 uppercase mb-1 flex items-center gap-1">
-                                <ImageIcon className="w-3 h-3" /> Spotlight Banner Image URL (Optional)
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300 p-4 bg-pink-50/50 rounded-xl border border-pink-100">
+                            <label className="text-xs font-bold text-pink-600 uppercase mb-2 flex items-center gap-1">
+                                <ImageIcon className="w-3 h-3" /> Spotlight Banner Image
                             </label>
-                            <div className="relative">
-                                <input
-                                    name="promoImage"
-                                    type="url"
-                                    placeholder="High-res wide banner URL"
-                                    value={formData.promoImage || ''}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-shadow text-sm"
-                                />
-                            </div>
-                            {formData.promoImage && (
-                                <div className="mt-2 text-center">
-                                    <img src={formData.promoImage} alt="Promo Preview" className="h-20 w-fit mx-auto rounded-lg object-cover border border-pink-200 shadow-sm" />
+                            
+                            <div className="space-y-3">
+                                {/* URL Input */}
+                                <div className="relative">
+                                    <input
+                                        name="promoImage"
+                                        type="url"
+                                        placeholder="High-res wide banner URL"
+                                        value={formData.promoImage || ''}
+                                        onChange={handleChange}
+                                        className="w-full px-3 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-shadow text-sm"
+                                    />
                                 </div>
-                            )}
-                            <p className="text-[10px] text-stone-400 mt-1">Recommended aspect ratio 4:3 or wider. This will be shown natively as the homepage banner.</p>
+
+                                {/* File Upload */}
+                                <div className="flex items-center gap-3">
+                                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-pink-200 rounded-lg hover:border-pink-400 cursor-pointer transition-colors text-pink-500 hover:text-pink-700 bg-white">
+                                        <Upload className="w-4 h-4" />
+                                        <span className="text-xs font-semibold">{selectedFiles.promoImage ? selectedFiles.promoImage.name : 'Upload Banner Image'}</span>
+                                        <input
+                                            type="file"
+                                            name="promoImage"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                        />
+                                    </label>
+                                </div>
+
+                                {(previews.promoImage || formData.promoImage) && (
+                                    <div className="mt-2 text-center relative group">
+                                        <img 
+                                            src={previews.promoImage || formData.promoImage} 
+                                            alt="Promo Preview" 
+                                            className="h-28 w-full mx-auto rounded-xl object-cover border-2 border-pink-200 shadow-sm" 
+                                        />
+                                        <div className="absolute top-2 right-2 bg-pink-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-lg">Preview</div>
+                                    </div>
+                                )}
+                            </div>
+                            <p className="text-[10px] text-stone-400 mt-2">Recommended aspect ratio 4:3 or wider. This will be shown natively as the homepage banner.</p>
                         </div>
                     )}
 

@@ -32,8 +32,19 @@ const Home = () => {
 
             {/* --- Promotional Category Banner (Top Priority) --- */}
             {promoCategory && (
-                <section className="relative z-10 w-full pt-[64px] bg-[#2D281E] overflow-hidden">
-                    <div className="w-full relative h-[170px] sm:h-[190px] md:h-[220px] flex items-stretch group cursor-pointer">
+                <section 
+                    className="relative z-20 w-full pt-[64px] bg-[#2D281E] overflow-visible"
+                    style={{
+                        maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0,240 Q60,250 120,240 T240,240 T360,240 T480,240 T600,240 T720,240 T840,240 T960,240 T1080,240 T1200,240 T1320,240 T1440,240L1440,0L0,0Z'/%3E%3C/svg%3E")`,
+                        WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0,240 Q60,250 120,240 T240,240 T360,240 T480,240 T600,240 T720,240 T840,240 T960,240 T1080,240 T1200,240 T1320,240 T1440,240L1440,0L0,0Z'/%3E%3C/svg%3E")`,
+                        maskSize: '100% 100%',
+                        WebkitMaskSize: '100% 100%',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskRepeat: 'no-repeat',
+                        marginBottom: '-90px'
+                    }}
+                >
+                    <div className="w-full relative h-[180px] sm:h-[200px] md:h-[220px] flex items-stretch group cursor-pointer pb-12">
                         <Link to={`/category/${promoCategory._id}`} className="absolute inset-0 z-20"></Link>
 
                         {/* Left: Elegant Dark Text Panel */}
@@ -46,8 +57,7 @@ const Home = () => {
                             </div>
 
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white tracking-tight leading-[1.1] mb-1">
-                                The <span className="italic font-light text-[#FFD55F]">{promoCategory.name}</span> <br />
-                                Collection
+                                The <span className="italic font-light text-[#FFD55F]">{promoCategory.name}</span> Collection
                             </h2>
 
 
@@ -65,54 +75,32 @@ const Home = () => {
                                 <div
                                     className="w-full h-full relative"
                                     style={{
-                                        WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%, black 80%, transparent 100%), linear-gradient(to bottom, black 60%, transparent 100%)',
-                                        WebkitMaskComposite: 'source-in',
+                                        WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%, black 80%, transparent 100%)',
                                         maskImage: 'linear-gradient(to right, transparent 0%, black 40%, black 80%, transparent 100%)',
                                     }}
                                 >
                                     <img
-                                        src={promoCategory.image}
+                                        src={promoCategory.promoImage || promoCategory.image}
                                         alt={promoCategory.name}
                                         className="w-full h-full object-cover object-left-center group-hover:scale-105 transition-transform duration-1000 ease-out opacity-80"
                                     />
                                     {/* Extra left-side dark fade overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-[#2D281E] via-transparent to-transparent" />
-                                    {/* Bottom fade into wave */}
-                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#2D281E]/60" />
                                 </div>
                             ) : (
                                 <div
                                     className="w-full h-full bg-[#3d382d] flex items-center justify-center"
-                                    style={{
-                                        WebkitMaskImage: 'linear-gradient(to right, transparent, black 40%)',
-                                        maskImage: 'linear-gradient(to right, transparent, black 40%)'
-                                    }}
                                 >
                                     <Gift className="w-20 h-20 text-[#FFD55F] opacity-20" />
                                 </div>
                             )}
                         </div>
                     </div>
-
-                    {/* Seamless Wavy Transition - Gap-free overlap */}
-                    <div className="absolute bottom-[-2px] left-0 w-full overflow-hidden leading-[0] z-20 pointer-events-none">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 1440 60"
-                            preserveAspectRatio="none"
-                            className="block w-full h-[30px] md:h-[50px] scale-x-105"
-                        >
-                            <path
-                                d="M0,60 L0,30 Q60,45 120,30 Q180,15 240,30 Q300,45 360,30 Q420,15 480,30 Q540,45 600,30 Q660,15 720,30 Q780,45 840,30 Q900,15 960,30 Q1020,45 1080,30 Q1140,15 1200,30 Q1260,45 1320,30 Q1380,15 1440,30 L1440,60 Z"
-                                fill="#FDFBF7"
-                            />
-                        </svg>
-                    </div>
                 </section>
             )}
 
             {/* --- Hero: Emotional & Warm --- */}
-            <section className={`relative flex items-center justify-center px-6 overflow-hidden ${promoCategory ? 'min-h-[15vh] pb-10 pt-0 -mt-1' : 'min-h-[85vh] pb-24 pt-32'}`}>
+            <section className={`relative flex items-center justify-center px-6 overflow-hidden ${promoCategory ? 'min-h-[20vh] pb-10 pt-24' : 'min-h-[85vh] pb-24 pt-32'}`}>
                 <div className="absolute inset-0 z-0">
                     <img
                         src="https://images.unsplash.com/photo-1513201099705-a9746e1e201f?q=80&w=2574&auto=format&fit=crop"
