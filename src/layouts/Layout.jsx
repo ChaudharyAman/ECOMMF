@@ -313,7 +313,7 @@ const Layout = () => {
             </header>
 
             {/* Main Content */}
-            <main className={`flex-1 w-full ${!isHomePage ? 'pt-24' : ''}`}>
+            <main className={`flex-1 w-full ${!isHomePage ? 'pt-16' : ''}`}>
                 <Outlet />
             </main>
 

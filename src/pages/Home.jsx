@@ -32,28 +32,25 @@ const Home = () => {
 
             {/* --- Promotional Category Banner (Top Priority) --- */}
             {promoCategory && (
-                <section className="relative z-10 w-full pt-[80px] bg-[#2D281E] overflow-hidden">
-                    <div className="w-full relative h-[160px] sm:h-[190px] md:h-[220px] flex items-stretch group cursor-pointer">
+                <section className="relative z-10 w-full pt-[64px] bg-[#2D281E] overflow-hidden">
+                    <div className="w-full relative h-[170px] sm:h-[190px] md:h-[220px] flex items-stretch group cursor-pointer">
                         <Link to={`/category/${promoCategory._id}`} className="absolute inset-0 z-20"></Link>
 
                         {/* Left: Elegant Dark Text Panel */}
-                        <div className="relative z-10 flex flex-col justify-center py-6 px-6 sm:px-12 md:px-20 w-[70%] md:w-[50%] flex-shrink-0">
+                        <div className="relative z-10 flex flex-col justify-center py-4 px-6 sm:px-12 md:px-20 w-[70%] md:w-[50%] flex-shrink-0">
 
                             {/* Premium Spotlight Badge */}
-                            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-stone-800/50 border border-stone-700/50 shadow-lg mb-4 w-fit">
+                            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-stone-800/50 border border-stone-700/50 shadow-lg mb-2 w-fit">
                                 <Star className="w-3 h-3 text-[#FFD55F] fill-[#FFD55F]" />
                                 <span className="text-[9px] md:text-xs font-bold tracking-[0.2em] uppercase text-stone-200">Curated Spotlight</span>
                             </div>
 
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white tracking-tight leading-[1.1] mb-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white tracking-tight leading-[1.1] mb-1">
                                 The <span className="italic font-light text-[#FFD55F]">{promoCategory.name}</span> <br />
                                 Collection
                             </h2>
 
-                            <p className="text-sm md:text-base text-stone-300 font-light mb-3 sm:mb-4 line-clamp-2 max-w-md leading-relaxed">
-                                Thoughtfully curated for those who give with intention. <br className="hidden md:block" />
-                                Discover something unforgettable.
-                            </p>
+
 
                             {/* Premium Yellow Button */}
                             <div className="inline-flex items-center gap-2 bg-[#FFD55F] text-stone-950 px-6 py-3 rounded-full text-[10px] md:text-xs font-black tracking-widest hover:bg-[#ffcd3c] hover:scale-105 transition-all w-fit shadow-xl shadow-yellow-500/20 uppercase border border-yellow-400/20">
@@ -68,15 +65,20 @@ const Home = () => {
                                 <div
                                     className="w-full h-full relative"
                                     style={{
-                                        WebkitMaskImage: 'linear-gradient(to right, transparent, black 15% 90%, transparent)',
-                                        maskImage: 'linear-gradient(to right, transparent, black 15% 90%, transparent)'
+                                        WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 40%, black 80%, transparent 100%), linear-gradient(to bottom, black 60%, transparent 100%)',
+                                        WebkitMaskComposite: 'source-in',
+                                        maskImage: 'linear-gradient(to right, transparent 0%, black 40%, black 80%, transparent 100%)',
                                     }}
                                 >
                                     <img
                                         src={promoCategory.image}
                                         alt={promoCategory.name}
-                                        className="w-full h-full object-cover object-left-center group-hover:scale-105 transition-transform duration-1000 ease-out"
+                                        className="w-full h-full object-cover object-left-center group-hover:scale-105 transition-transform duration-1000 ease-out opacity-80"
                                     />
+                                    {/* Extra left-side dark fade overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#2D281E] via-transparent to-transparent" />
+                                    {/* Bottom fade into wave */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#2D281E]/60" />
                                 </div>
                             ) : (
                                 <div
@@ -110,7 +112,7 @@ const Home = () => {
             )}
 
             {/* --- Hero: Emotional & Warm --- */}
-            <section className={`relative flex items-center justify-center px-6 overflow-hidden ${promoCategory ? 'min-h-[40vh] pb-24 pt-0 -mt-1' : 'min-h-[85vh] pb-24 pt-32'}`}>
+            <section className={`relative flex items-center justify-center px-6 overflow-hidden ${promoCategory ? 'min-h-[15vh] pb-10 pt-0 -mt-1' : 'min-h-[85vh] pb-24 pt-32'}`}>
                 <div className="absolute inset-0 z-0">
                     <img
                         src="https://images.unsplash.com/photo-1513201099705-a9746e1e201f?q=80&w=2574&auto=format&fit=crop"
