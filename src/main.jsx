@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -11,29 +11,29 @@ if ('scrollRestoration' in history) {
 }
 import './index.css'
 import Layout from './layouts/Layout'
-import Auth from './pages/Auth'
-import Profile from './pages/Profile'
-import AdminDashboard from './pages/AdminDashboard'
-import VendorDashboard from './pages/VendorDashboard'
-
-import Categories from './pages/Categories'
-import CategoryProducts from './pages/CategoryProducts'
-import Products from './pages/Products'
-import CategoryManagement from './pages/CategoryManagement'
-
 import App from './App'
-import ProductDetails from './pages/ProductDetails'
 import AdminRoute from './components/AdminRoute'
-import ProductModeration from './pages/ProductModeration'
-import VendorManagement from './pages/VendorManagement'
 import ErrorPage from './pages/ErrorPage'
+import Home from './pages/Home' // Keep Home static for instant load
+import Auth from './pages/Auth' // Keep Auth static for fast login
 
-import Home from './pages/Home'
-import SearchResults from './pages/SearchResults'
-import About from './pages/About'
+import { RootSkeleton, PageSkeleton, DetailSkeleton } from './components/Skeletons'
 
-import Cart from './pages/Cart'
-import Wishlist from './pages/Wishlist'
+// Lazy loaded pages
+const Profile = lazy(() => import('./pages/Profile'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const VendorDashboard = lazy(() => import('./pages/VendorDashboard'))
+const Categories = lazy(() => import('./pages/Categories'))
+const CategoryProducts = lazy(() => import('./pages/CategoryProducts'))
+const Products = lazy(() => import('./pages/Products'))
+const CategoryManagement = lazy(() => import('./pages/CategoryManagement'))
+const ProductDetails = lazy(() => import('./pages/ProductDetails'))
+const ProductModeration = lazy(() => import('./pages/ProductModeration'))
+const VendorManagement = lazy(() => import('./pages/VendorManagement'))
+const SearchResults = lazy(() => import('./pages/SearchResults'))
+const About = lazy(() => import('./pages/About'))
+const Cart = lazy(() => import('./pages/Cart'))
+const Wishlist = lazy(() => import('./pages/Wishlist'))
 
 const router = createBrowserRouter([
   {
@@ -47,15 +47,15 @@ const router = createBrowserRouter([
       },
       {
         path: 'cart',
-        element: <Cart />,
+        element: <Suspense fallback={<PageSkeleton />}><Cart /></Suspense>,
       },
       {
         path: 'wishlist',
-        element: <Wishlist />,
+        element: <Suspense fallback={<PageSkeleton />}><Wishlist /></Suspense>,
       },
       {
         path: 'product/:id',
-        element: <ProductDetails />,
+        element: <Suspense fallback={<DetailSkeleton />}><ProductDetails /></Suspense>,
       },
       {
         path: 'login',
@@ -67,7 +67,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        element: <Profile />,
+        element: <Suspense fallback={<PageSkeleton />}><Profile /></Suspense>,
       },
       {
         path: 'admin',
@@ -75,45 +75,45 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminDashboard />
+            element: <Suspense fallback={<PageSkeleton />}><AdminDashboard /></Suspense>
           },
           {
             path: 'moderation',
-            element: <ProductModeration />
+            element: <Suspense fallback={<PageSkeleton />}><ProductModeration /></Suspense>
           },
           {
             path: 'vendors',
-            element: <VendorManagement />
+            element: <Suspense fallback={<PageSkeleton />}><VendorManagement /></Suspense>
           },
           {
             path: 'categories',
-            element: <CategoryManagement />
+            element: <Suspense fallback={<PageSkeleton />}><CategoryManagement /></Suspense>
           }
         ]
       },
       {
         path: 'vendor',
-        element: <VendorDashboard />,
+        element: <Suspense fallback={<PageSkeleton />}><VendorDashboard /></Suspense>,
       },
       {
         path: 'categories',
-        element: <Categories />,
+        element: <Suspense fallback={<PageSkeleton />}><Categories /></Suspense>,
       },
       {
         path: 'category/:id',
-        element: <CategoryProducts />,
+        element: <Suspense fallback={<PageSkeleton />}><CategoryProducts /></Suspense>,
       },
       {
         path: 'products',
-        element: <Products />,
+        element: <Suspense fallback={<PageSkeleton />}><Products /></Suspense>,
       },
       {
         path: 'search',
-        element: <SearchResults />,
+        element: <Suspense fallback={<PageSkeleton />}><SearchResults /></Suspense>,
       },
       {
         path: 'about',
-        element: <About />,
+        element: <Suspense fallback={<PageSkeleton />}><About /></Suspense>,
       },
     ],
   },
