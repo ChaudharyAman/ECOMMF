@@ -34,6 +34,7 @@ const SearchResults = lazy(() => import('./pages/SearchResults'))
 const About = lazy(() => import('./pages/About'))
 const Cart = lazy(() => import('./pages/Cart'))
 const Wishlist = lazy(() => import('./pages/Wishlist'))
+const ProductReviews = lazy(() => import('./pages/ProductReviews'))
 
 const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: 'product/:id',
         element: <Suspense fallback={<DetailSkeleton />}><ProductDetails /></Suspense>,
+      },
+      {
+        path: 'product/:id/reviews',
+        element: <Suspense fallback={<PageSkeleton />}><ProductReviews /></Suspense>,
       },
       {
         path: 'login',
