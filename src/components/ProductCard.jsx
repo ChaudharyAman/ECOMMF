@@ -50,9 +50,15 @@ const ProductCard = ({ product }) => {
                             {typeof product.category === 'object' ? product.category.name : 'Category'}
                         </p>
                     )}
-                    <h3 className="text-stone-900 font-medium leading-tight group-hover:text-stone-600 transition-colors">
+                    <h3 className="text-stone-900 font-medium leading-tight group-hover:text-stone-600 transition-colors mb-1">
                         {product.name}
                     </h3>
+                    <div className="flex items-center gap-1">
+                        <Star className={`w-3 h-3 ${product.rating > 0 ? 'fill-amber-400 text-amber-400' : 'text-stone-300'}`} />
+                        <span className="text-xs text-stone-500">
+                            {product.rating ? product.rating.toFixed(1) : 'No rating'}
+                        </span>
+                    </div>
                 </div>
                 <span className="text-stone-900 font-serif">₹{product.price?.toLocaleString()}</span>
             </div>

@@ -7,6 +7,7 @@ import { toggleWishlist } from '../features/wishlist/wishlistSlice';
 import { ArrowLeft, ShoppingCart, Heart, Share2, Package, Truck, ShieldCheck, RefreshCw, Star, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import toast from 'react-hot-toast';
+import api from '../utils/api';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const ProductDetails = () => {
 
   const { products, relatedProducts, loading } = useSelector((state) => state.products);
   const { items: wishlistItems } = useSelector((state) => state.wishlist);
+  const { user } = useSelector((state) => state.auth);
   
   // Find product in products or relatedProducts to avoid flashing "Not Found" while fetching
   const product = products.find(p => p._id === id) || relatedProducts.find(p => p._id === id);
@@ -26,6 +28,9 @@ const ProductDetails = () => {
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   // Scroll to top whenever navigating to a new product
   useEffect(() => {
@@ -84,6 +89,26 @@ const ProductDetails = () => {
   const handlePrevImage = () => {
     if (product.images && product.images.length > 0) {
       setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
+  const submitReviewHandler = async (e) => {
+    e.preventDefault();
+    if (rating === 0) {
+      toast.error('Please select a rating');
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      await api.post(`/products/${id}/reviews`, { rating, comment });
+      toast.success('Review submitted successfully');
+      setRating(0);
+      setComment('');
+      dispatch(fetchProductById(id));
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to submit review');
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -232,14 +257,16 @@ const ProductDetails = () => {
                 {product.name}
               </h1>
 
-              {/* Rating (Placeholder) */}
+              {/* Rating */}
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    <Star key={i} className={`w-4 h-4 ${i < (product.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-stone-300'}`} />
                   ))}
                 </div>
-                <span className="text-sm text-stone-500">(4.8 · 127 reviews)</span>
+                <span className="text-sm text-stone-500">
+                  ({product.rating ? product.rating.toFixed(1) : 'No ratings yet'} · {product.numReviews} review{product.numReviews !== 1 ? 's' : ''})
+                </span>
               </div>
             </div>
 
@@ -373,6 +400,77 @@ const ProductDetails = () => {
                   </dd>
                 </div>
               </dl>
+            </div>
+            
+            {/* Reviews Section */}
+            <div className="border-t border-stone-200 pt-6">
+              <h3 className="text-lg font-bold text-stone-900 mb-4">Reviews</h3>
+              {product.reviews && product.reviews.length === 0 && (
+                <div className="bg-stone-50 p-4 rounded-lg mb-4 text-stone-600 text-sm">No reviews yet. Be the first to review this product!</div>
+              )}
+              {product.reviews && product.reviews.length > 0 && (
+                <div className="space-y-4 mb-6">
+                  {product.reviews.map((rev) => (
+                    <div key={rev._id} className="bg-stone-50 p-4 rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-semibold text-stone-900 text-sm">{rev.name}</span>
+                        <div className="flex items-center gap-1 text-xs text-stone-500">
+                          {new Date(rev.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`w-3 h-3 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-stone-300'}`} />
+                        ))}
+                      </div>
+                      <p className="text-sm text-stone-600">{rev.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <h4 className="text-md font-bold text-stone-900 mb-4">Write a Customer Review</h4>
+              {user ? (
+                <form onSubmit={submitReviewHandler} className="space-y-4 bg-white p-4 border border-stone-200 rounded-lg">
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 mb-1">Rating</label>
+                    <select
+                      value={rating}
+                      onChange={(e) => setRating(Number(e.target.value))}
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition duration-200 bg-white"
+                    >
+                      <option value="">Select...</option>
+                      <option value="1">1 - Poor</option>
+                      <option value="2">2 - Fair</option>
+                      <option value="3">3 - Good</option>
+                      <option value="4">4 - Very Good</option>
+                      <option value="5">5 - Excellent</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 mb-1">Comment</label>
+                    <textarea
+                      rows="3"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      required
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition duration-200 resize-none"
+                      placeholder="Share your thoughts about this product..."
+                    ></textarea>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={submittingReview}
+                    className="px-6 py-2 bg-stone-900 text-white font-medium rounded-lg hover:bg-stone-800 transition-colors disabled:opacity-50"
+                  >
+                    {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </form>
+              ) : (
+                <div className="bg-stone-50 p-4 border border-stone-200 rounded-lg text-sm text-stone-600">
+                  Please <Link to="/login" className="text-stone-900 font-bold underline">log in</Link> to write a review
+                </div>
+              )}
             </div>
           </div>
         </div>
