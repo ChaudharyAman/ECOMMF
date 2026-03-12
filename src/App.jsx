@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
 import { loadUser } from './features/auth/authSlice';
+import api from './utils/api';
 
 const App = ({ router }) => {
   const dispatch = useDispatch();
@@ -23,12 +24,8 @@ const App = ({ router }) => {
         // Function to actually send the tracking request
         const sendTracking = async (loc) => {
            try {
-              const response = await fetch(`${import.meta.env.VITE_API_URL}/visitors/track`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ location: loc })
-              });
-              if (response.ok) {
+              const response = await api.post('/visitors/track', { location: loc });
+              if (response.status === 200) {
                 sessionStorage.setItem('visitorTracked', 'true');
               }
            } catch (e) {

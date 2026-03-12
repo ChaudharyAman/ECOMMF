@@ -81,15 +81,15 @@ const AdminUsers = () => {
         {/* Left Side: List */}
         <div className={`w-full ${selectedUser ? 'lg:w-1/2' : ''} transition-all duration-300`}>
           {activeTab === 'registered' && (
-            <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
-              <table className="w-full text-left border-collapse">
+            <div className="bg-white rounded-lg shadow border border-gray-200 overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[600px]">
                 <thead>
                   <tr className="bg-gray-50 text-gray-600 border-b border-gray-200 text-sm">
-                    <th className="p-4 font-medium">Name</th>
-                    <th className="p-4 font-medium">Contact</th>
-                    <th className="p-4 font-medium">Role</th>
-                    <th className="p-4 font-medium">Joined</th>
-                    <th className="p-4 font-medium text-right">Actions</th>
+                    <th className="p-4 font-medium whitespace-nowrap">Name</th>
+                    <th className="p-4 font-medium whitespace-nowrap">Contact</th>
+                    <th className="p-4 font-medium whitespace-nowrap">Role</th>
+                    <th className="p-4 font-medium whitespace-nowrap">Joined</th>
+                    <th className="p-4 font-medium text-right whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -98,29 +98,29 @@ const AdminUsers = () => {
                       key={user._id} 
                       className={`border-b border-gray-100 hover:bg-blue-50/50 transition-colors ${selectedUser?._id === user._id ? 'bg-blue-50/80 shadow-inner' : ''}`}
                     >
-                      <td className="p-4">
+                      <td className="p-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs uppercase">
+                           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs uppercase shrink-0">
                              {user.name.charAt(0)}
                            </div>
-                           <span className="font-medium text-gray-900">{user.name}</span>
+                           <span className="font-medium text-gray-900 truncate max-w-[120px] inline-block">{user.name}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-sm text-gray-600">
-                        <div>{user.email || 'No email'}</div>
-                        <div className="text-xs text-gray-400">{user.phone}</div>
+                      <td className="p-4 text-sm text-gray-600 max-w-[150px]">
+                        <div className="truncate" title={user.email}>{user.email || 'No email'}</div>
+                        <div className="text-xs text-gray-400 truncate" title={user.phone}>{user.phone || 'No phone'}</div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium uppercase ${
                           user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
                         }`}>
                           {user.role}
                         </span>
                       </td>
-                      <td className="p-4 text-sm text-gray-500">
+                      <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 text-right whitespace-nowrap">
                         <button
                           onClick={() => fetchUserDetails(user._id)}
                           className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center justify-end gap-1 w-full"
@@ -194,17 +194,23 @@ const AdminUsers = () => {
               ) : (
                 <>
                   <div className="bg-slate-900 p-6 flex items-center gap-6">
-                    <img 
-                      src={selectedUser.avatar || 'https://via.placeholder.com/150'} 
-                      alt="Avatar" 
-                      className="w-24 h-24 rounded-full border-4 border-slate-700 object-cover"
-                    />
-                    <div>
-                      <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                    {selectedUser.avatar && selectedUser.avatar.startsWith('http') ? (
+                      <img 
+                        src={selectedUser.avatar} 
+                        alt="Avatar" 
+                        className="w-24 h-24 rounded-full border-4 border-slate-700 object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full border-4 border-slate-700 bg-slate-800 flex items-center justify-center text-4xl text-slate-300 font-bold uppercase shrink-0">
+                        {selectedUser.name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="overflow-hidden">
+                      <h2 className="text-2xl font-bold text-white flex items-center gap-2 truncate">
                         {selectedUser.name}
-                        {selectedUser.role === 'admin' && <ShieldCheck className="w-5 h-5 text-amber-400" />}
+                        {selectedUser.role === 'admin' && <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0" />}
                       </h2>
-                      <p className="text-slate-400">{selectedUser.email || 'No email provided'}</p>
+                      <p className="text-slate-400 truncate" title={selectedUser.email}>{selectedUser.email || 'No email provided'}</p>
                       <span className="inline-block mt-2 px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-800 text-slate-300 uppercase tracking-widest border border-slate-700">
                         ID: {selectedUser._id}
                       </span>
