@@ -140,14 +140,15 @@ const AdminUsers = () => {
             </div>
           )}
 
-          {activeTab === 'guests' && (
+           {activeTab === 'guests' && (
              <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
                <table className="w-full text-left border-collapse">
                  <thead>
                    <tr className="bg-gray-50 text-gray-600 border-b border-gray-200 text-sm">
                      <th className="p-4 font-medium">IP Address</th>
+                     <th className="p-4 font-medium">Location</th>
                      <th className="p-4 font-medium">User Agent</th>
-                     <th className="p-4 font-medium">Total Visits</th>
+                     <th className="p-4 font-medium">Visits</th>
                      <th className="p-4 font-medium">Last Visit</th>
                    </tr>
                  </thead>
@@ -157,20 +158,23 @@ const AdminUsers = () => {
                        <td className="p-4 font-mono text-sm text-gray-900 border-l-[3px] border-l-orange-400">
                          {visitor.ipAddress}
                        </td>
+                       <td className="p-4 text-sm text-gray-700">
+                         {visitor.location || 'Unknown'}
+                       </td>
                        <td className="p-4 text-xs text-gray-500 max-w-[250px] truncate" title={visitor.userAgent}>
                          {visitor.userAgent}
                        </td>
-                       <td className="p-4 text-sm text-gray-900 font-medium">
+                       <td className="p-4 text-sm text-gray-900 font-medium whitespace-nowrap">
                          {visitor.visitCount}
                        </td>
-                       <td className="p-4 text-sm text-gray-500">
+                       <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
                          {new Date(visitor.lastVisit).toLocaleString()}
                        </td>
                      </tr>
                    ))}
                    {visitors.length === 0 && (
                      <tr>
-                        <td colSpan="4" className="p-8 text-center text-gray-500">No visitor records found.</td>
+                        <td colSpan="5" className="p-8 text-center text-gray-500">No visitor records found.</td>
                      </tr>
                   )}
                  </tbody>
