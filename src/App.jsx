@@ -16,31 +16,36 @@ const App = ({ router }) => {
     // Track visitor and optionally request location
     const trackVisitor = async () => {
       try {
-        // We only want to track once per session to avoid spamming location requests
+        // We only want to track once per session to avoid spamming
         if (sessionStorage.getItem('visitorTracked')) return;
 
-        let locationData = 'Unknown';
-        
-        // Function to actually send the tracking request
-        const sendTracking = async (loc) => {
-           try {
-              const response = await api.post('/visitors/track', { location: loc });
-              if (response.status === 200) {
-                sessionStorage.setItem('visitorTracked', 'true');
-              }
-           } catch (e) {
-              console.error('Failed to track visitor', e);
-           }
-        };
+        // Ensure persistent visitor ID
+        let visitorId = localStorage.getItem('visitorId');
+        if (!visitorId) {
+          visitorId = 'v_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+          localStorage.setItem('visitorId', visitorId);
+        }
 
-        // Ask for location
+        // 1. Immediately track the visitor hit to ensure they are captured
+        try {
+          const response = await api.post('/visitors/track', { 
+            location: 'Unknown',
+            visitorId 
+          });
+          if (response.status === 200) {
+            sessionStorage.setItem('visitorTracked', 'true');
+          }
+        } catch (e) {
+          console.error('Failed initial tracking', e);
+        }
+
+        // 2. Ask for location in the background
         if ('geolocation' in navigator) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
-              // Successfully got coordinates. Try to reverse geocode for a nice string (optional, or just send coords)
               const { latitude, longitude } = position.coords;
+              let locationData = '';
               try {
-                // Using a free reverse geocoding API to get City, Country
                 const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
                 const geoData = await geoRes.json();
                 
@@ -54,18 +59,24 @@ const App = ({ router }) => {
               } catch (geoError) {
                 locationData = `Lat: ${latitude.toFixed(2)}, Lng: ${longitude.toFixed(2)}`;
               }
-              await sendTracking(locationData);
+              
+              // 3. Send a specifically flagged update to augment the row with location data
+              try {
+                await api.post('/visitors/track', { 
+                  location: locationData, 
+                  isLocationUpdate: true,
+                  visitorId 
+                });
+              } catch (e) {
+                console.error('Failed to update tracking location', e);
+              }
             },
             (error) => {
-              // User denied location or error occurred
-              console.log('Location access denied or failed. Tracking without location.');
-              sendTracking('Unknown (Denied/Failed)');
+              // Location access denied or failed - no action needed since we already logged the visit above
+              console.log('Location access denied or failed. Visit already tracked without location.');
             },
-            { timeout: 5000 } // Don't wait forever for location
+            { timeout: 10000 } // Don't wait forever for location, but gave more time
           );
-        } else {
-          // Geolocation not supported
-          sendTracking('Unknown (Not Supported)');
         }
       } catch (err) {
         console.error('Tracking process error:', err);
