@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Users, Activity, ExternalLink, MapPin } from 'lucide-react';
+import { ShieldCheck, Users, Activity, ExternalLink, MapPin, TrendingUp, Globe, UserCheck, MousePointer2 } from 'lucide-react';
 import api from '../utils/api';
 import { PageSkeleton } from '../components/Skeletons';
 
@@ -48,9 +48,56 @@ const AdminUsers = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-3">
-          <Users className="w-8 h-8 text-blue-600" />
+          <TrendingUp className="w-8 h-8 text-blue-600" />
           Users & Analytics
         </h1>
+      </div>
+
+      {/* Analytics Summary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+            <UserCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Registered</p>
+            <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+            <Globe className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Unique Guests</p>
+            <p className="text-2xl font-bold text-gray-900">{visitors.length}</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+            <MousePointer2 className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Visits</p>
+            <p className="text-2xl font-bold text-gray-900">
+               {visitors.reduce((acc, curr) => acc + (curr.visitCount || 0), 0)}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+            <Activity className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Last Pulse</p>
+            <p className="text-lg font-bold text-gray-900 truncate max-w-[120px]">
+               {visitors.length > 0 ? new Date(visitors[0].lastVisit).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}

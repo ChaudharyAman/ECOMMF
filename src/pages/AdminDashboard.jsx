@@ -32,17 +32,17 @@ const AdminDashboard = () => {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-          <h2 className="text-xl font-semibold mb-4">Financials</h2>
-          <p className="text-gray-600 mb-4">View settlements and platform revenue.</p>
-          <span className="text-gray-400 cursor-not-allowed">Coming Soon</span>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
           <h2 className="text-xl font-semibold mb-4">Users & Analytics</h2>
           <p className="text-gray-600 mb-4">View registered users, guests, and their complete details.</p>
           <Link to="/admin/users" className="text-blue-600 hover:text-blue-800 font-medium">
             Manage Users &rarr;
           </Link>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 className="text-xl font-semibold mb-4">Financials</h2>
+          <p className="text-gray-600 mb-4">View settlements and platform revenue.</p>
+          <span className="text-gray-400 cursor-not-allowed">Coming Soon</span>
         </div>
       </div>
     </div>
