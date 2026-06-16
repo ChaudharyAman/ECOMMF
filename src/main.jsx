@@ -13,6 +13,7 @@ import './index.css'
 import Layout from './layouts/Layout'
 import App from './App'
 import AdminRoute from './components/AdminRoute'
+import ProtectedRoute from './components/ProtectedRoute'
 import ErrorPage from './pages/ErrorPage'
 import Home from './pages/Home' // Keep Home static for instant load
 import Auth from './pages/Auth' // Keep Auth static for fast login
@@ -33,6 +34,10 @@ const VendorManagement = lazy(() => import('./pages/VendorManagement'))
 const SearchResults = lazy(() => import('./pages/SearchResults'))
 const About = lazy(() => import('./pages/About'))
 const Cart = lazy(() => import('./pages/Cart'))
+const Checkout = lazy(() => import('./pages/Checkout'))
+const CompanyStore = lazy(() => import('./pages/CompanyStore'))
+const MyOrders = lazy(() => import('./pages/MyOrders'))
+const OrderTracking = lazy(() => import('./pages/OrderTracking'))
 const Wishlist = lazy(() => import('./pages/Wishlist'))
 const ProductReviews = lazy(() => import('./pages/ProductReviews'))
 const AdminUsers = lazy(() => import('./pages/AdminUsers'))
@@ -50,6 +55,27 @@ const router = createBrowserRouter([
       {
         path: 'cart',
         element: <Suspense fallback={<PageSkeleton />}><Cart /></Suspense>,
+      },
+      {
+        path: 'company/:slug',
+        element: <Suspense fallback={<PageSkeleton />}><CompanyStore /></Suspense>,
+      },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: 'checkout',
+            element: <Suspense fallback={<PageSkeleton />}><Checkout /></Suspense>,
+          },
+          {
+            path: 'orders',
+            element: <Suspense fallback={<PageSkeleton />}><MyOrders /></Suspense>,
+          },
+          {
+            path: 'orders/:id',
+            element: <Suspense fallback={<PageSkeleton />}><OrderTracking /></Suspense>,
+          },
+        ],
       },
       {
         path: 'wishlist',

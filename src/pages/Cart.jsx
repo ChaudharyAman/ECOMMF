@@ -139,9 +139,12 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button className="w-full py-4 bg-stone-900 text-white rounded-lg font-semibold hover:bg-stone-800 transition-colors shadow-lg shadow-stone-900/10">
+              <Link
+                to="/checkout"
+                className="w-full py-4 bg-stone-900 text-white rounded-lg font-semibold hover:bg-stone-800 transition-colors shadow-lg shadow-stone-900/10 block text-center"
+              >
                 Proceed to Checkout
-              </button>
+              </Link>
               
               <div className="mt-6 text-xs text-stone-500 text-center">
                 Secure Checkout • Free Returns • 100% Authentic

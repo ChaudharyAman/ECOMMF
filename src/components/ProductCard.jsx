@@ -59,6 +59,17 @@ const ProductCard = ({ product }) => {
                             {product.rating ? product.rating.toFixed(1) : 'No rating'}
                         </span>
                     </div>
+                    {product.vendor && typeof product.vendor === 'object' && product.vendor.slug && (
+                        <div className="mt-2 text-[11px] text-stone-400">
+                            <span>Sold by: </span>
+                            <Link 
+                                to={`/company/${product.vendor.slug}`} 
+                                className="font-bold text-stone-650 hover:text-stone-900 hover:underline transition-colors"
+                            >
+                                {product.vendor.storeName}
+                            </Link>
+                        </div>
+                    )}
                 </div>
                 <span className="text-stone-900 font-serif">₹{product.price?.toLocaleString()}</span>
             </div>
